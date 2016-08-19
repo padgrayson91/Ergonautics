@@ -26,20 +26,18 @@ public class ErgonautAPI {
     public static final int ERROR_UNKNOWN = 99; //Unknown error
 
     private LocalStorage mStorage;
-    private Context mContext;
 
     public ErgonautAPI(Context c){
-        mContext = c;
         mStorage = LocalStorage.getInstance(c);
     }
 
     public int addTask(Task t, String boardId){
         try {
             String token = mStorage.getSessionToken();
-            String taskRequestAsJson = ModelHelper.getTaskRequestAsJson(t, boardId);
+            String taskRequestAsJson = JsonModelHelper.getTaskRequestAsJson(t, boardId);
             String result = APIHelper.postTask(token, taskRequestAsJson);
             Log.d(TAG, "addTask: " + result);
-            int errorCode = ModelHelper.getErrorCode(result);
+            int errorCode = JsonModelHelper.getErrorCode(result);
             return errorCode;
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,10 +52,10 @@ public class ErgonautAPI {
     public int addBoard(Board b){
         try {
             String token = mStorage.getSessionToken();
-            String boardAsJson = ModelHelper.getBoardAsJson(b);
+            String boardAsJson = JsonModelHelper.getBoardAsJson(b);
             String result = APIHelper.postBoard(token, boardAsJson);
             Log.d(TAG, "addBoard: " + result);
-            int errorCode = ModelHelper.getErrorCode(result);
+            int errorCode = JsonModelHelper.getErrorCode(result);
             return errorCode;
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,7 +74,7 @@ public class ErgonautAPI {
             response = APIHelper.getTask(token, taskId);
             Log.d(TAG, "getTask: " + response);
             //TODO: check response
-            return ModelHelper.getTaskFromJson(response);
+            return JsonModelHelper.getTaskFromJson(response);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -92,7 +90,7 @@ public class ErgonautAPI {
             String response = APIHelper.getBoard(token, boardId);
             Log.d(TAG, "getBoard: " + response);
             //TODO: check response
-            return ModelHelper.getBoardFromJson(response);
+            return JsonModelHelper.getBoardFromJson(response);
         } catch (IOException e){
             e.printStackTrace();
             return null;
@@ -104,12 +102,12 @@ public class ErgonautAPI {
 
     public int login(String username, String password){
         try {
-            String loginAsJson = ModelHelper.getLoginAsJson(username, password);
+            String loginAsJson = JsonModelHelper.getLoginAsJson(username, password);
             String response = APIHelper.login(loginAsJson);
             Log.d(TAG, "login: " + response);
-            int errorCode = ModelHelper.getErrorCode(response);
+            int errorCode = JsonModelHelper.getErrorCode(response);
             if(errorCode == SUCCESS) {
-                String token = ModelHelper.getTokenFromLogin(response);
+                String token = JsonModelHelper.getTokenFromLogin(response);
                 mStorage.setSessionToken(token);
 
             }
@@ -125,10 +123,10 @@ public class ErgonautAPI {
 
     public int register(String username, String password){
         try {
-            String registrationAsJson = ModelHelper.getRegistrationAsJson(username, password);
+            String registrationAsJson = JsonModelHelper.getRegistrationAsJson(username, password);
             String response = APIHelper.register(registrationAsJson);
             Log.d(TAG, "register: " + response);
-            int errorCode = ModelHelper.getErrorCode(response);
+            int errorCode = JsonModelHelper.getErrorCode(response);
             return errorCode;
         } catch (IOException e){
             e.printStackTrace();

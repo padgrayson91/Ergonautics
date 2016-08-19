@@ -17,7 +17,7 @@ import okhttp3.Response;
 public class APIHelper {
     //Values to use for all API connections
     private static final String PROTOCOL = "http://";
-    private static final String HOST = "ergonautix.com";
+    private static final String HOST = "ergonautics.com";
     private static final int PORT = 80;
 
     //API endpoints

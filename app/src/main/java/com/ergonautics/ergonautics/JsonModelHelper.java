@@ -7,11 +7,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 /**
  * Created by patrickgrayson on 8/18/16.
  * Class to convert between Java model classes and JSON strings
  */
-public class ModelHelper {
+public class JsonModelHelper {
     //JSON keys
     private static final String KEY_TASK = "task";
     private static final String KEY_TASK_NAME = "display_name";
@@ -56,7 +58,7 @@ public class ModelHelper {
     }
 
     /**
-     *
+     * Should only be called on a board whose tasks are synced with remote API
      * @param b the board to parse
      * @return the requested Board as a JSON String
      */
@@ -64,8 +66,8 @@ public class ModelHelper {
         JSONObject jobj = new JSONObject();
         jobj.put(KEY_BOARD_NAME, b.getDisplayName());
         JSONArray tasks = new JSONArray();
-        for(String id:b.getTaskIds()){
-            tasks.put(id);
+        for(Task t: b.getTasks()){
+            tasks.put(t.getTaskId());
         }
         jobj.put(KEY_BOARD_TASKS, tasks);
         //TODO: add more fields as needed
@@ -91,19 +93,32 @@ public class ModelHelper {
     /**
      *
      * @param json the JSON String to parse
-     * @return the board object parsed from the JSON String
+     * @return the board object parsed from the JSON String wi
      */
     public static Board getBoardFromJson(String json) throws JSONException {
         JSONObject jobj = new JSONObject(json);
         Board result = new Board(jobj.getString(KEY_BOARD_NAME));
-        JSONArray taskIds = jobj.getJSONArray(KEY_BOARD_TASKS);
-        for(int i = 0; i < taskIds.length(); i++){
-            result.addTask(taskIds.getString(i));
-        }
         if(jobj.has(KEY_BOARD_ID)){
             result.setBoardId(jobj.getString(KEY_BOARD_ID));
         }
         //TODO: get more fields as needed
+        return result;
+    }
+
+
+    /**
+     *
+     * @param json the JSON string for the board to parse
+     * @return the remote task IDs for each task as an ArrayList
+     * @throws JSONException
+     */
+    public static ArrayList<String> getTaskIdsForBoardFromJson(String json) throws JSONException {
+        JSONObject jobj = new JSONObject(json);
+        JSONArray taskIds = jobj.getJSONArray(KEY_BOARD_TASKS);
+        ArrayList<String> result = new ArrayList<>(taskIds.length());
+        for(int i = 0; i < taskIds.length(); i++){
+            result.add(taskIds.getString(i));
+        }
         return result;
     }
 
