@@ -1,49 +1,46 @@
 package com.ergonautics.ergonautics.models;
 
-import java.util.ArrayList;
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
 /**
  * Created by patrickgrayson on 8/18/16.
  * Model class for boards, which contain a list of Tasks
  */
-public class Board implements ModelConstants {
-    private ArrayList<Task> mTasks;
-    private String mDisplayName;
-    private String mBoardId; //Used by remote API: may be null if user created this board while offline
-    private int mLocalId; //Used by local db: all boards should have this value once stored
+public class Board extends RealmObject implements ModelConstants {
+    private RealmList<Task> tasks;
+    private String displayName;
+    private String boardId; //Used by remote API: may be null if user created this board while offline
 
     public Board(String displayName){
-        mDisplayName = displayName;
-        mTasks = new ArrayList<>();
-        mBoardId = REMOTE_ID_DEFAULT;
-        mLocalId = LOCAL_ID_DEFAULT;
+        this.displayName = displayName;
+        tasks = new RealmList<Task>();
+        boardId = REMOTE_ID_DEFAULT;
+    }
+
+    public Board(){
+        displayName = "";
+        boardId = REMOTE_ID_DEFAULT;
+        tasks = new RealmList<>();
     }
 
     public String getDisplayName(){
-        return mDisplayName;
+        return displayName;
     }
 
-    public ArrayList<Task> getTasks(){
-        return mTasks;
+    public RealmList<Task> getTasks(){
+        return tasks;
     }
 
     public String getBoardId(){
-        return mBoardId;
-    }
-
-    public int getLocalId(){
-        return mLocalId;
+        return boardId;
     }
 
     public void setBoardId(String id){
-        mBoardId = id;
-    }
-
-    public void setLocalId(int id){
-        mLocalId = id;
+        boardId = id;
     }
 
     public void addTask(Task toAdd){
-        mTasks.add(toAdd);
+        tasks.add(toAdd);
     }
 }

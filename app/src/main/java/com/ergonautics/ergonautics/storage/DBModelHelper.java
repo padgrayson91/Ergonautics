@@ -1,9 +1,12 @@
 package com.ergonautics.ergonautics.storage;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.Task;
+
+import java.util.UUID;
 
 /**
  * Created by patrickgrayson on 8/19/16.
@@ -21,13 +24,69 @@ public class DBModelHelper {
         ContentValues cv = new ContentValues();
         cv.put(DBHelper.BoardsTable.COLUMN_DISPLAY_NAME, b.getDisplayName());
         cv.put(DBHelper.BoardsTable.COLUMN_BOARD_ID, b.getBoardId());
+        //TODO add tasks in some form
         return cv;
     }
 
-    public static ContentValues getContentValuesForBoardTaskRelations(long taskId, long boardId){
-        ContentValues cv = new ContentValues();
-        cv.put(DBHelper.TaskBoardRelationTable.COLUMN_TASK_LOCAL_ID, taskId);
-        cv.put(DBHelper.TaskBoardRelationTable.COLUMN_BOARD_LOCAL_ID, boardId);
-        return cv;
+    //NOTE: This should always match the order of DBHelper.TasksTable.COLUMNS!
+    public static Object[] getTaskProperties(Task t){
+        Object [] props = new Object[DBHelper.TasksTable.COLUMNS.length];
+        props[0] = t.getTaskId();
+        props[1] = t.getDisplayName();
+        //TODO: this can be accessed via reflection to avoid the need to update this method
+        return props;
+    }
+
+    //NOTE: This should always match the order of DBHelper.BoardsTable.COLUMNS!
+    public static Object[] getBoardProperties(Board b) {
+        Object [] props = new Object[DBHelper.BoardsTable.COLUMNS.length];
+        props[0] = b.getBoardId();
+        props[1] = b.getDisplayName();
+        props[2] = b.getTasks();
+        //TODO: this can be accessed via reflection to avoid the need to update this method
+        return props;
+    }
+
+    //NOTE: This should always match the order of DBHelper.TasksTable.COLUMNS!
+    public static Task getTaskFromContentValues(ContentValues cv, Task toUpdate){
+        toUpdate.setTaskId(cv.getAsString(DBHelper.TasksTable.COLUMN_TASK_ID));
+        toUpdate.setDisplayName(cv.getAsString(DBHelper.TasksTable.COLUMN_DISPLAY_NAME));
+        //TODO: the fields can be accessed via reflection to avoid the need to update this method
+        return toUpdate;
+    }
+
+    public static Board getBoardFromContentValues(ContentValues cv, Board toUpdate){
+        toUpdate.setBoardId(UUID.randomUUID().toString());
+        toUpdate.setBoardId(cv.getAsString(DBHelper.BoardsTable.COLUMN_BOARD_ID));
+
+        return toUpdate;
+    }
+
+    //methods to convert DB entries to model objects
+
+    /**
+     * Creates a task object from the current row of the cursor.  This will not move the cursor
+     * @param c the cursor, which should have been pulled from the "tasks" table
+     * @return a Task object with appropriate values pulled from the cursor
+     */
+    public static Task getTaskFromCursor(Cursor c){
+        String displayName = c.getString(c.getColumnIndex(DBHelper.TasksTable.COLUMN_DISPLAY_NAME));
+        Task t = new Task(displayName);
+        String taskId = c.getString(c.getColumnIndex(DBHelper.TasksTable.COLUMN_TASK_ID));
+        t.setTaskId(taskId);
+        return t;
+    }
+
+    /**
+     * Creates a board object from the current row of the cursor. This will not move the cursor
+     * @param c the cursor, which should have been pulled from the "boards" table
+     * @return a Board object with appropriate values pulled from the cursor, but with an empty task list
+     */
+    public static Board getBoardFromCursor(Cursor c){
+        String displayName = c.getString(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_DISPLAY_NAME));
+        Board b = new Board(displayName);
+        String boardId = c.getString(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_BOARD_ID));
+        b.setBoardId(boardId);
+        return b;
     }
 }

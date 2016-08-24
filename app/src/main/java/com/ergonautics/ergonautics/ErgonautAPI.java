@@ -10,6 +10,7 @@ import com.ergonautics.ergonautics.storage.LocalStorage;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by patrickgrayson on 8/18/16.
@@ -36,7 +37,8 @@ public class ErgonautAPI {
             String token = mStorage.getSessionToken();
             String taskRequestAsJson = JsonModelHelper.getTaskRequestAsJson(t, boardId);
             String result = APIHelper.postTask(token, taskRequestAsJson);
-            Log.d(TAG, "addTask: " + result);
+            //TODO: update local db with generate remote task ID
+            Log.d(TAG, "createTask: " + result);
             int errorCode = JsonModelHelper.getErrorCode(result);
             return errorCode;
         } catch (IOException e) {
@@ -54,7 +56,8 @@ public class ErgonautAPI {
             String token = mStorage.getSessionToken();
             String boardAsJson = JsonModelHelper.getBoardAsJson(b);
             String result = APIHelper.postBoard(token, boardAsJson);
-            Log.d(TAG, "addBoard: " + result);
+            //TODO: update local db with generated remote board ID
+            Log.d(TAG, "createBoard: " + result);
             int errorCode = JsonModelHelper.getErrorCode(result);
             return errorCode;
         } catch (IOException e) {
@@ -92,6 +95,40 @@ public class ErgonautAPI {
             //TODO: check response
             return JsonModelHelper.getBoardFromJson(response);
         } catch (IOException e){
+            e.printStackTrace();
+            return null;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public ArrayList<Task> getAllTasks(){
+        try {
+            String token = mStorage.getSessionToken();
+            String response = null;
+            response = APIHelper.getAllTasks(token);
+            Log.d(TAG, "getAllTasks: " + response);
+            //TODO: check response
+            return JsonModelHelper.getTasksFromJson(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public ArrayList<Board> getAllBoards(){
+        try {
+            String token = mStorage.getSessionToken();
+            String response = null;
+            response = APIHelper.getAllBoards(token);
+            Log.d(TAG, "getAllBoards: " + response);
+            //TODO: check response
+            return JsonModelHelper.getBoardsFromJson(response);
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         } catch (JSONException e) {

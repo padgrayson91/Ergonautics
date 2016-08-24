@@ -27,7 +27,8 @@ public class JsonModelHelper {
     private static final String KEY_BOARD_TASKS = "tasks";
     private static final String KEY_SESSION_TOKEN = "token";
     private static final String KEY_ERROR_CODE = "error_code";
-
+    private static final String KEY_GLOBAL_TASKS = "tasks";
+    private static final String KEY_GLOBAL_BOARDS = "boards";
 
     /**
      *
@@ -92,6 +93,21 @@ public class JsonModelHelper {
 
     /**
      *
+     * @param json the JSON string containing a list of task objects
+     * @return the parsed list of tasks
+     */
+    public static ArrayList<Task> getTasksFromJson(String json) throws JSONException {
+        JSONObject jobj = new JSONObject(json);
+        ArrayList<Task> result = new ArrayList<>();
+        JSONArray tasksArray = jobj.getJSONArray(KEY_GLOBAL_TASKS);
+        for(int i = 0; i < tasksArray.length(); i++){
+            result.add(getTaskFromJson(tasksArray.getJSONObject(i).toString()));
+        }
+        return result;
+    }
+
+    /**
+     *
      * @param json the JSON String to parse
      * @return the board object parsed from the JSON String wi
      */
@@ -102,6 +118,22 @@ public class JsonModelHelper {
             result.setBoardId(jobj.getString(KEY_BOARD_ID));
         }
         //TODO: get more fields as needed
+        return result;
+    }
+
+    /**
+     *
+     * @param json a json string containing a list of board objects
+     * @return the parsed list of board objects with no associated tasks
+     */
+    public static ArrayList<Board> getBoardsFromJson(String json) throws JSONException {
+        JSONObject jobj = new JSONObject(json);
+        ArrayList<Board> result = new ArrayList<>();
+        JSONArray boardsArray = jobj.getJSONArray(KEY_GLOBAL_BOARDS);
+        for(int i = 0; i < boardsArray.length(); i++){
+            Board b = getBoardFromJson(boardsArray.getJSONObject(i).toString());
+            result.add(b);
+        }
         return result;
     }
 

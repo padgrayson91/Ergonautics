@@ -82,6 +82,17 @@ public class APIHelper {
         return response.body().string();
     }
 
+    public static String getAllTasks(String token) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .addHeader(API_TOKEN, token)
+                .url(getUrlString(TASKS_URL, null))
+                .get()
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+    }
+
     /**
      *
      * @param token the session token to use
@@ -93,6 +104,17 @@ public class APIHelper {
         Request request = new Request.Builder()
                 .addHeader(API_TOKEN, token)
                 .url(getUrlString(BOARDS_URL, boardId))
+                .get()
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+    }
+
+    public static String getAllBoards(String token) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .addHeader(API_TOKEN, token)
+                .url(getUrlString(BOARDS_URL, null))
                 .get()
                 .build();
         Response response = client.newCall(request).execute();

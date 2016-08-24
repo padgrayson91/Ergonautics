@@ -2,11 +2,38 @@ package com.ergonautics.ergonautics.storage;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
+
+import java.util.List;
 
 public class ErgonautContentProvider extends ContentProvider {
-    public ErgonautContentProvider() {
+    private static final String TAG = "ERGONAUT-CP";
+    private DBHelper mDb;
+    private static final String AUTHORITY = "com.ergonautics.ergonautics.ErgonautContentProvider";
+    private static final String TASKS_TABLE = "tasks";
+    private static final String BOARDS_TABLE = "boards";
+    public static final Uri TASKS_INSERT_URI = Uri.parse("content://"
+            + AUTHORITY + "/" + BOARDS_TABLE + "/*/"  + TASKS_TABLE);
+    public static final Uri BOARDS_INSERT_URI = Uri.parse("content://"
+            + AUTHORITY + "/" + BOARDS_TABLE);
+
+    public static final int TASKS = 1;
+    public static final int BOARDS = 2;
+
+    private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
+    static {
+        sURIMatcher.addURI(AUTHORITY, BOARDS_TABLE + "/*/" + TASKS_TABLE, TASKS);
+        sURIMatcher.addURI(AUTHORITY, BOARDS_TABLE, BOARDS);
+    }
+
+    @Override
+    public boolean onCreate() {
+        mDb = new DBHelper(getContext());
+        return true;
     }
 
     @Override
@@ -24,21 +51,42 @@ public class ErgonautContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        // TODO: Implement this to handle requests to insert a new row.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public boolean onCreate() {
-        // TODO: Implement this to initialize your content provider on startup.
-        return false;
+        //Check which model we are using and perform the insertion accordingly
+        String id = "";
+        switch (sURIMatcher.match(uri)){
+            case TASKS:
+                List<String> segments = uri.getPathSegments();
+                Log.d(TAG, "insert: " + segments.toString());
+                String boardId = segments.get(1);
+                mDb.createTask(values, boardId);
+                break;
+            case BOARDS:
+                mDb.createBoard(values);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid URI " + uri.toString());
+        }
+        return Uri.withAppendedPath(uri, "/" + id);
     }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        // TODO: Implement this to handle query requests from clients.
-        throw new UnsupportedOperationException("Not yet implemented");
+        Cursor result = null;
+        //Check which model we are using and perform the insertion accordingly
+        Log.d(TAG, "query: Got request for data at URI " + uri.toString());
+        switch (sURIMatcher.match(uri)){
+            case TASKS:
+                result = mDb.getAllTasks();
+                break;
+            case BOARDS:
+                result = mDb.getAllBoards();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid URI " + uri.toString());
+        }
+        return result;
+
     }
 
     @Override

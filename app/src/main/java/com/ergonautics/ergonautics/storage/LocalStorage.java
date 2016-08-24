@@ -2,18 +2,21 @@ package com.ergonautics.ergonautics.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
  * Created by patrickgrayson on 8/18/16.
  * Wrapper for Android SharedPreferences
  */
 public class LocalStorage {
+    private static final String TAG = "ERGONAUT-STORE";
     private static LocalStorage sInstance;
     private static SharedPreferences mPrefs;
 
     public static LocalStorage getInstance(Context c){
         if(sInstance == null){
             sInstance = new LocalStorage(c);
+            Log.d(TAG, "getInstance: created new storage instance " + sInstance);
         }
         return sInstance;
     }
