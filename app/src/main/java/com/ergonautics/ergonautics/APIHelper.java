@@ -3,6 +3,7 @@ package com.ergonautics.ergonautics;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -14,7 +15,7 @@ import okhttp3.Response;
  * Created by patrickgrayson on 8/18/16.
  * Class to abstract all communications with the Ergonaut API
  */
-public class APIHelper {
+class APIHelper {
     //Values to use for all API connections
     private static final String PROTOCOL = "http://";
     private static final String HOST = "ergonautics.com";
@@ -30,7 +31,7 @@ public class APIHelper {
     private static final String API_TOKEN = "api-token";
 
     //For okhttp
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
 
     /**
@@ -165,9 +166,9 @@ public class APIHelper {
      */
     private static String getUrlString(String endpoint, @Nullable String resource){
         if(resource == null) {
-            return String.format("%s%s:%d/%s", PROTOCOL, HOST, PORT, endpoint);
+            return String.format(Locale.US, "%s%s:%d/%s", PROTOCOL, HOST, PORT, endpoint);
         } else {
-            return String.format("%s%s:%d/%s/%s", PROTOCOL, HOST, PORT, endpoint, resource);
+            return String.format(Locale.US, "%s%s:%d/%s/%s", PROTOCOL, HOST, PORT, endpoint, resource);
         }
     }
 

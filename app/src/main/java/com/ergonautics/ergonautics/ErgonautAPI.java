@@ -37,10 +37,9 @@ public class ErgonautAPI {
             String token = mStorage.getSessionToken();
             String taskRequestAsJson = JsonModelHelper.getTaskRequestAsJson(t, boardId);
             String result = APIHelper.postTask(token, taskRequestAsJson);
-            //TODO: update local db with generate remote task ID
+            //TODO should update the ID of the task that was posted in our DB
             Log.d(TAG, "createTask: " + result);
-            int errorCode = JsonModelHelper.getErrorCode(result);
-            return errorCode;
+            return JsonModelHelper.getErrorCode(result);
         } catch (IOException e) {
             e.printStackTrace();
             //TODO: check error
@@ -58,8 +57,7 @@ public class ErgonautAPI {
             String result = APIHelper.postBoard(token, boardAsJson);
             //TODO: update local db with generated remote board ID
             Log.d(TAG, "createBoard: " + result);
-            int errorCode = JsonModelHelper.getErrorCode(result);
-            return errorCode;
+            return JsonModelHelper.getErrorCode(result);
         } catch (IOException e) {
             e.printStackTrace();
             //TODO: check error
@@ -163,8 +161,7 @@ public class ErgonautAPI {
             String registrationAsJson = JsonModelHelper.getRegistrationAsJson(username, password);
             String response = APIHelper.register(registrationAsJson);
             Log.d(TAG, "register: " + response);
-            int errorCode = JsonModelHelper.getErrorCode(response);
-            return errorCode;
+            return JsonModelHelper.getErrorCode(response);
         } catch (IOException e){
             e.printStackTrace();
             //TODO: check error

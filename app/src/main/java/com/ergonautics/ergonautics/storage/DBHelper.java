@@ -24,7 +24,6 @@ public class DBHelper {
     private static final int DATABASE_VERSION = 1;
 
     private Realm mRealm;
-    private RealmConfiguration mRealmConfig;
     private Context mContext;
 
 
@@ -53,7 +52,7 @@ public class DBHelper {
 
     public DBHelper(Context context) {
         mContext = context;
-        mRealmConfig = new RealmConfiguration.Builder(mContext).build();
+        RealmConfiguration mRealmConfig = new RealmConfiguration.Builder(mContext).build();
         mRealm = Realm.getInstance(mRealmConfig);
     }
 
@@ -75,6 +74,7 @@ public class DBHelper {
                 DBModelHelper.getTaskFromContentValues(taskVals, t);
             }
         });
+        //TODO: update board to include task
         return id;
 
     }

@@ -22,7 +22,7 @@
             android:name=".storage.ErgonautContentProvider"
             android:authorities="com.ergonautics.ergonautics.ErgonautContentProvider"
             android:enabled="true"
-            android:exported="false"></provider>
+            android:exported="false"/>
     </application>
 
 </manifest>

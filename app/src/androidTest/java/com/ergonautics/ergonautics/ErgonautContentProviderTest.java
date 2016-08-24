@@ -37,12 +37,14 @@ public class ErgonautContentProviderTest {
         Uri uri = mResolver.insert(ErgonautContentProvider.BOARDS_INSERT_URI, bVals);
         //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
         String boardId = uri.getLastPathSegment();
+        assertNotNull(boardId);
         assertTrue(boardId.length() > 4);
         Task t = new Task("Example Task");
         ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
         String uriString = ErgonautContentProvider.TASKS_INSERT_URI.toString();
-        uriString.replace("*", boardId);
+        uriString = uriString.replace("*", boardId);
         Uri taskUri = mResolver.insert(Uri.parse(uriString), tVals);
+        assertNotNull(taskUri);
         //Ensure the task id is at least 4 digits
         String taskId = taskUri.getLastPathSegment();
         assertTrue(taskId.length() > 4);
@@ -53,6 +55,7 @@ public class ErgonautContentProviderTest {
         Board b = new Board("Example Board");
         ContentValues bVals = DBModelHelper.getContentValuesForBoard(b);
         Uri uri = mResolver.insert(ErgonautContentProvider.BOARDS_INSERT_URI, bVals);
+        assertNotNull(uri);
         //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
         String boardId = uri.getLastPathSegment();
         assertTrue(boardId.length() > 4);

@@ -47,6 +47,6 @@ public class LocalStorage {
     public void setSessionToken(String token){
         SharedPreferences.Editor editor = mPrefs.edit();
         editor.putString(PROPERTY_SESSION_TOKEN, token);
-        editor.commit();
+        editor.apply();
     }
 }

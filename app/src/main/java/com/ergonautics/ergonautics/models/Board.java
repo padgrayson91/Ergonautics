@@ -8,18 +8,18 @@ import io.realm.RealmObject;
  * Model class for boards, which contain a list of Tasks
  */
 public class Board extends RealmObject implements ModelConstants {
-    private RealmList<Task> tasks;
+    private final RealmList<Task> tasks;
     private String displayName;
     private String boardId; //Used by remote API: may be null if user created this board while offline
 
     public Board(String displayName){
         this.displayName = displayName;
-        tasks = new RealmList<Task>();
+        tasks = new RealmList<>();
         boardId = REMOTE_ID_DEFAULT;
     }
 
     public Board(){
-        displayName = "";
+        displayName = DISPLAY_NAME_DEFAULT;
         boardId = REMOTE_ID_DEFAULT;
         tasks = new RealmList<>();
     }

@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity implements LoginTask.ILogin
         mLoginButton.setOnClickListener(mLoginListener);
     }
 
-    View.OnClickListener mLoginListener = new View.OnClickListener() {
+    private final View.OnClickListener mLoginListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Log.d(TAG, "onClick - attempting login" );
@@ -43,6 +43,6 @@ public class LoginActivity extends AppCompatActivity implements LoginTask.ILogin
 
     @Override
     public void onLoginComplete(int result) {
-        Log.d(TAG, "onLoginComplete: notified of login completion" );
+        Log.d(TAG, "onLoginComplete: notified of login completion with result " + result);
     }
 }

@@ -9,7 +9,7 @@ import com.ergonautics.ergonautics.ErgonautAPI;
 /**
  * Created by patrickgrayson on 8/24/16.
  */
-public class LoginTask extends AsyncTask<String, Void, Integer> {
+class LoginTask extends AsyncTask<String, Void, Integer> {
     private static final String TAG = "ERGONAUT-LOGIN";
     public interface ILoginListener {
         void onLoginComplete(int result);

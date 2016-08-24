@@ -14,7 +14,6 @@ import com.ergonautics.ergonautics.storage.LocalStorage;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "ERGONAUT-MAIN";
     private static final int REQUEST_CODE_LOGIN = 1001;
-    private LocalStorage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Check if user is logged in
-        storage = LocalStorage.getInstance(this);
+        LocalStorage storage = LocalStorage.getInstance(this);
         if(storage.getSessionToken().isEmpty()){
             switchToLoginActivity();
         }

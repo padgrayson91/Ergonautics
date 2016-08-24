@@ -11,7 +11,7 @@ public class Task extends RealmObject implements ModelConstants {
     private String taskId; //Used for the remote API: May be null if user is offline
 
     public Task(){
-        displayName = "";
+        displayName = DISPLAY_NAME_DEFAULT;
         taskId = REMOTE_ID_DEFAULT;
     }
 

@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Created by patrickgrayson on 8/18/16.
  * Class to convert between Java model classes and JSON strings
  */
-public class JsonModelHelper {
+class JsonModelHelper {
     //JSON keys
     private static final String KEY_TASK = "task";
     private static final String KEY_TASK_NAME = "display_name";
@@ -38,24 +38,22 @@ public class JsonModelHelper {
     public static String getTaskAsJson(Task t) throws JSONException {
         JSONObject jobj = new JSONObject();
         jobj.put(KEY_TASK_NAME, t.getDisplayName());
-        String result = jobj.toString();
         //TODO: add more fields as needed
-        return result;
+        return jobj.toString();
     }
 
     /**
      *
      * @param t the task we want to generate a request for
      * @param boardId the ID of the board where the task is being added
-     * @return
+     * @return a JSON string representing the task
      */
     public static String getTaskRequestAsJson(Task t, String boardId) throws JSONException {
         String taskAsJson = getTaskAsJson(t);
         JSONObject jobj = new JSONObject();
         jobj.put(KEY_TASK, new JSONObject(taskAsJson));
         jobj.put(KEY_BOARD_ID, boardId);
-        String result = jobj.toString();
-        return result;
+        return jobj.toString();
     }
 
     /**
@@ -72,8 +70,7 @@ public class JsonModelHelper {
         }
         jobj.put(KEY_BOARD_TASKS, tasks);
         //TODO: add more fields as needed
-        String result = jobj.toString();
-        return result;
+        return jobj.toString();
     }
 
     /**
@@ -158,14 +155,13 @@ public class JsonModelHelper {
      *
      * @param username the username to include in the returned JSON String
      * @param password the password to include in the returned JSON String
-     * @return
+     * @return a JSON string representing the registration request
      */
     public static String getRegistrationAsJson(String username, String password) throws JSONException {
         JSONObject jobj = new JSONObject();
         jobj.put(KEY_USERNAME_REGISTER, username);
         jobj.put(KEY_PASSWORD_REGISTER, password);
-        String result = jobj.toString();
-        return result;
+        return jobj.toString();
     }
 
 
@@ -179,8 +175,7 @@ public class JsonModelHelper {
         JSONObject jobj = new JSONObject();
         jobj.put(KEY_USERNAME_LOGIN, username);
         jobj.put(KEY_PASSWORD_LOGIN, password);
-        String result = jobj.toString();
-        return result;
+        return jobj.toString();
     }
 
     /**
@@ -190,8 +185,7 @@ public class JsonModelHelper {
      */
     public static String getTokenFromLogin(String loginResponseAsJson) throws JSONException {
         JSONObject jobj = new JSONObject(loginResponseAsJson);
-        String token = jobj.getString(KEY_SESSION_TOKEN);
-        return token;
+        return jobj.getString(KEY_SESSION_TOKEN);
     }
 
     /**
