@@ -15,19 +15,32 @@ public class ErgonautContentProvider extends ContentProvider {
     private static final String AUTHORITY = "com.ergonautics.ergonautics.ErgonautContentProvider";
     private static final String TASKS_TABLE = "tasks";
     private static final String BOARDS_TABLE = "boards";
-    public static final Uri TASKS_INSERT_URI = Uri.parse("content://"
-            + AUTHORITY + "/" + BOARDS_TABLE + "/*/"  + TASKS_TABLE);
-    public static final Uri BOARDS_INSERT_URI = Uri.parse("content://"
-            + AUTHORITY + "/" + BOARDS_TABLE);
+    private static final String PREFIX = "content://";
+    private static final String TASKS_INSERT_PATH = BOARDS_TABLE + "/*/"  + TASKS_TABLE;
+    private static final String BOARDS_INSERT_PATH = BOARDS_TABLE;
+    private static final String TASKS_QUERY_PATH = TASKS_TABLE;
+    private static final String BOARDS_QUERY_PATH = BOARDS_TABLE;
+    public static final Uri TASKS_INSERT_URI = Uri.parse(PREFIX
+            + AUTHORITY + "/" + TASKS_INSERT_PATH);
+    public static final Uri BOARDS_INSERT_URI = Uri.parse(PREFIX
+            + AUTHORITY + "/" + BOARDS_INSERT_PATH);
+    public static final Uri TASKS_QUERY_URI = Uri.parse(PREFIX
+            + AUTHORITY + "/" + TASKS_QUERY_PATH);
+    public static final Uri BOARDS_QUERY_URI = Uri.parse(PREFIX
+            + AUTHORITY + "/" + BOARDS_QUERY_PATH);
 
     private static final int TASKS = 1;
     private static final int BOARDS = 2;
+    private static final int TASKS_FOR_BOARD = 3;
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        sURIMatcher.addURI(AUTHORITY, BOARDS_TABLE + "/*/" + TASKS_TABLE, TASKS);
+        sURIMatcher.addURI(AUTHORITY, TASKS_TABLE, TASKS);
         sURIMatcher.addURI(AUTHORITY, BOARDS_TABLE, BOARDS);
+        sURIMatcher.addURI(AUTHORITY, BOARDS_TABLE + "/*/" + TASKS_TABLE, TASKS_FOR_BOARD);
+        sURIMatcher.addURI(AUTHORITY, TASKS_TABLE + "/*", TASKS);
+        sURIMatcher.addURI(AUTHORITY, BOARDS_TABLE + "/*", BOARDS);
     }
 
     @Override
@@ -54,18 +67,19 @@ public class ErgonautContentProvider extends ContentProvider {
         String id = "";
         DBHelper db = new DBHelper(getContext());
         switch (sURIMatcher.match(uri)){
-            case TASKS:
+            case TASKS_FOR_BOARD:
                 List<String> segments = uri.getPathSegments();
-                Log.d(TAG, "insert: " + segments.toString());
+                Log.d(TAG, "insert: segments " + segments.toString());
                 String boardId = segments.get(1);
-                db.createTask(values, boardId);
+                id = db.createTask(values, boardId);
                 break;
             case BOARDS:
-                db.createBoard(values);
+                id = db.createBoard(values);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid URI " + uri.toString());
         }
+        Log.d(TAG, "insert: value inserted with id " + id);
         return Uri.withAppendedPath(uri, "/" + id);
     }
 
@@ -78,10 +92,28 @@ public class ErgonautContentProvider extends ContentProvider {
         Log.d(TAG, "query: Got request for data at URI " + uri.toString());
         switch (sURIMatcher.match(uri)){
             case TASKS:
-                result = db.getAllTasks();
+                Log.d(TAG, "query: segments " + uri.getPathSegments().toString());
+                if(uri.getLastPathSegment().equals(TASKS_TABLE)) {
+                    //Request for all tasks
+                    result = db.getAllTasks();
+                } else {
+                    String id = uri.getLastPathSegment();
+                    result = db.getTaskById(id);
+                }
                 break;
             case BOARDS:
-                result = db.getAllBoards();
+                if(uri.getLastPathSegment().equals(BOARDS_TABLE)){
+                    //Request for all boards
+                    result = db.getAllBoards();
+                } else {
+                    String id = uri.getLastPathSegment();
+                    result = db.getBoardById(id);
+                }
+                break;
+            case TASKS_FOR_BOARD:
+                List<String> segments = uri.getPathSegments();
+                String boardId = segments.get(1);
+                result = db.getTasksForBoard(boardId);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid URI " + uri.toString());

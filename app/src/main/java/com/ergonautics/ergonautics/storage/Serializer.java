@@ -96,13 +96,7 @@ public class Serializer {
     }
 
     private static Object getObjectFromWrapper(SerializableWrapper wrapper){
-        if(wrapper instanceof SerializableBoardWrapper){
-            return ((SerializableBoardWrapper) wrapper).unwrap();
-        } else if (wrapper instanceof SerializeableRealmListWrapper){
-            return ((SerializeableRealmListWrapper) wrapper).unwrap();
-        } else {
-            return null;
-        }
+        return wrapper.unwrap();
     }
 
 

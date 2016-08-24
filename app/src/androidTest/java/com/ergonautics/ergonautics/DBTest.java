@@ -67,6 +67,7 @@ public class DBTest {
 
         Cursor getResult = db.getBoardById(id);
         getResult.moveToFirst();
+        assertEquals("Multiple boards returned from ID query!", getResult.getCount(), 1);
         Board fetchedBoard = DBModelHelper.getBoardFromCursor(getResult);
         assertEquals(toAdd.getDisplayName(), fetchedBoard.getDisplayName());
     }
@@ -85,6 +86,7 @@ public class DBTest {
 
         Cursor getResult = db.getTaskById(id);
         getResult.moveToFirst();
+        assertEquals("Multiple tasks returned from ID query!", getResult.getCount(), 1);
         Task fetchedTask = DBModelHelper.getTaskFromCursor(getResult);
         assertEquals(taskToAdd.getDisplayName(), fetchedTask.getDisplayName());
     }
@@ -118,6 +120,54 @@ public class DBTest {
 
         Cursor result = db.getTasksForBoard(boardId);
         assertTrue(result.getCount() > 0);
+    }
+
+    @Test
+    public void testUpdateBoard(){
+        db = new DBHelper(getTargetContext());
+        Board toAdd = new Board("Example Board to Update");
+        ContentValues boardContent = DBModelHelper.getContentValuesForBoard(toAdd);
+        String id = db.createBoard(boardContent);
+        assertNotNull(id);
+
+        Cursor getResult = db.getBoardById(id);
+        getResult.moveToFirst();
+        Board fetchedBoard = DBModelHelper.getBoardFromCursor(getResult);
+        assertEquals(toAdd.getDisplayName(), fetchedBoard.getDisplayName());
+
+        fetchedBoard.setDisplayName("Example Board Updated");
+        db.updateBoard(DBModelHelper.getContentValuesForBoard(fetchedBoard));
+
+        getResult = db.getBoardById(id);
+        getResult.moveToFirst();
+        Board updatedBoard = DBModelHelper.getBoardFromCursor(getResult);
+        assertEquals("Example Board Updated", updatedBoard.getDisplayName());
+    }
+
+    @Test
+    public void testUpdateTask(){
+        db = new DBHelper(getTargetContext());
+        Board toAdd = new Board("Example Board with Task to fetch");
+        ContentValues boardContent = DBModelHelper.getContentValuesForBoard(toAdd);
+        String boardId = db.createBoard(boardContent);
+        assertNotNull(boardId);
+        Task taskToAdd = new Task("Example Task to Update");
+        ContentValues taskContent = DBModelHelper.getContentValuesForTask(taskToAdd);
+        String id = db.createTask(taskContent, boardId);
+        assertNotNull(id);
+
+        Cursor getResult = db.getTaskById(id);
+        getResult.moveToFirst();
+        Task fetchedTask = DBModelHelper.getTaskFromCursor(getResult);
+        assertEquals(taskToAdd.getDisplayName(), fetchedTask.getDisplayName());
+
+        fetchedTask.setDisplayName("Example Task Updated");
+        db.updateTask(DBModelHelper.getContentValuesForTask(fetchedTask));
+
+        getResult = db.getTaskById(id);
+        getResult.moveToFirst();
+        Task updatedTask = DBModelHelper.getTaskFromCursor(getResult);
+        assertEquals("Example Task Updated", updatedTask.getDisplayName());
     }
 
 

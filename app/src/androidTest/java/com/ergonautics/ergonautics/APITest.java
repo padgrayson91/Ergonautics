@@ -4,6 +4,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.ergonautics.ergonautics.models.Board;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,6 +86,11 @@ public class APITest {
     @Test
     public void testGetAllTasks(){
         //TODO
+    }
+
+    @After
+    public void tearDown(){
+        //TODO: delete all boards and tasks for user
     }
 
 }
