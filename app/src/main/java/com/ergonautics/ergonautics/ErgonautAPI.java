@@ -50,6 +50,16 @@ public class ErgonautAPI {
         }
     }
 
+    public boolean isLoggedIn(){
+        String token = mStorage.getSessionToken();
+        if(token.isEmpty()){
+            return false;
+        }
+
+        //TODO: verify that token is not expired
+        return true;
+    }
+
     public int addBoard(Board b){
         try {
             String token = mStorage.getSessionToken();

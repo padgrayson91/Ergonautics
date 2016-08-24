@@ -1,12 +1,12 @@
 package com.ergonautics.ergonautics.app;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.ergonautics.ergonautics.ErgonautAPI;
 import com.ergonautics.ergonautics.R;
-import com.ergonautics.ergonautics.storage.LocalStorage;
 
 /**
  * App main page where user can view active tasks, current boards, notifications, etc.
@@ -21,8 +21,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Check if user is logged in
-        LocalStorage storage = LocalStorage.getInstance(this);
-        if(storage.getSessionToken().isEmpty()){
+        ErgonautAPI api = new ErgonautAPI(this);
+        if(!api.isLoggedIn()){
+            //If the user is not logged in, go to the login activity
             switchToLoginActivity();
         }
     }

@@ -6,7 +6,7 @@ import android.database.Cursor;
 import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.Task;
 
-import java.util.UUID;
+import io.realm.RealmList;
 
 /**
  * Created by patrickgrayson on 8/19/16.
@@ -24,7 +24,7 @@ public class DBModelHelper {
         ContentValues cv = new ContentValues();
         cv.put(DBHelper.BoardsTable.COLUMN_DISPLAY_NAME, b.getDisplayName());
         cv.put(DBHelper.BoardsTable.COLUMN_BOARD_ID, b.getBoardId());
-        //TODO add tasks in some form
+        cv.put(DBHelper.BoardsTable.COLUMN_TASKS, Serializer.serialize(b.getTasks()));
         return cv;
     }
 
@@ -33,7 +33,7 @@ public class DBModelHelper {
         Object [] props = new Object[DBHelper.TasksTable.COLUMNS.length];
         props[0] = t.getTaskId();
         props[1] = t.getDisplayName();
-        //TODO: this can be accessed via reflection to avoid the need to update this method
+        //TODO: further fields be accessed via reflection to avoid the need to update this method
         return props;
     }
 
@@ -42,8 +42,8 @@ public class DBModelHelper {
         Object [] props = new Object[DBHelper.BoardsTable.COLUMNS.length];
         props[0] = b.getBoardId();
         props[1] = b.getDisplayName();
-        props[2] = b.getTasks();
-        //TODO: this can be accessed via reflection to avoid the need to update this method
+        props[2] = Serializer.serialize(b.getTasks());
+        //TODO: further fields can be accessed via reflection to avoid the need to update this method
         return props;
     }
 
@@ -56,8 +56,14 @@ public class DBModelHelper {
     }
 
     public static Board getBoardFromContentValues(ContentValues cv, Board toUpdate){
-        toUpdate.setBoardId(UUID.randomUUID().toString());
         toUpdate.setBoardId(cv.getAsString(DBHelper.BoardsTable.COLUMN_BOARD_ID));
+        toUpdate.setDisplayName(cv.getAsString(DBHelper.BoardsTable.COLUMN_DISPLAY_NAME));
+        try {
+            RealmList<Task> tasks = (RealmList<Task>) Serializer.deserialize(cv.getAsByteArray(DBHelper.BoardsTable.COLUMN_TASKS));
+            for (Task t : tasks) {
+                toUpdate.addTask(t);
+            }
+        } catch (NullPointerException ignored){}
 
         return toUpdate;
     }
@@ -87,6 +93,11 @@ public class DBModelHelper {
         Board b = new Board(displayName);
         String boardId = c.getString(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_BOARD_ID));
         b.setBoardId(boardId);
+        RealmList<Task> tasks = (RealmList<Task>) Serializer.deserialize(c.getBlob(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_TASKS)));
+        for(Task t: tasks){
+            b.addTask(t);
+        }
+
         return b;
     }
 }

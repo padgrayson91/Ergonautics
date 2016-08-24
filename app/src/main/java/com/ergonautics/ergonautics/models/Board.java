@@ -1,5 +1,7 @@
 package com.ergonautics.ergonautics.models;
 
+import java.io.Serializable;
+
 import io.realm.RealmList;
 import io.realm.RealmObject;
 
@@ -7,8 +9,8 @@ import io.realm.RealmObject;
  * Created by patrickgrayson on 8/18/16.
  * Model class for boards, which contain a list of Tasks
  */
-public class Board extends RealmObject implements ModelConstants {
-    private final RealmList<Task> tasks;
+public class Board extends RealmObject implements ModelConstants, Serializable {
+    private RealmList<Task> tasks;
     private String displayName;
     private String boardId; //Used by remote API: may be null if user created this board while offline
 
@@ -39,6 +41,8 @@ public class Board extends RealmObject implements ModelConstants {
     public void setBoardId(String id){
         boardId = id;
     }
+
+    public void setDisplayName(String name) { displayName = name; }
 
     public void addTask(Task toAdd){
         tasks.add(toAdd);

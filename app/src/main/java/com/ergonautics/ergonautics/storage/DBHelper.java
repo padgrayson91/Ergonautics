@@ -20,6 +20,8 @@ import io.realm.RealmConfiguration;
  * Relationship of boards to tasks
  */
 public class DBHelper {
+    private static final String TAG = "ERGONAUT-DB";
+
     private static final String DATABASE_NAME = "ergonautics";
     private static final int DATABASE_VERSION = 1;
 
@@ -74,7 +76,7 @@ public class DBHelper {
                 DBModelHelper.getTaskFromContentValues(taskVals, t);
             }
         });
-        //TODO: update board to include task
+        addTaskToBoard(boardId, taskVals);
         return id;
 
     }
@@ -93,7 +95,42 @@ public class DBHelper {
         return id;
     }
 
-    //TODO: methods for updating entries
+    //Methods for updating entries
+
+    public void updateTask(final ContentValues vals) {
+        final Task t = mRealm.where(Task.class).equalTo(TasksTable.COLUMN_TASK_ID, vals.getAsString(TasksTable.COLUMN_TASK_ID)).findFirst();
+
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                DBModelHelper.getTaskFromContentValues(vals, t);
+            }
+        });
+    }
+
+    public void updateBoard(final ContentValues vals) {
+        final Board b = mRealm.where(Board.class).equalTo(BoardsTable.COLUMN_BOARD_ID, vals.getAsString(BoardsTable.COLUMN_BOARD_ID)).findFirst();
+
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                DBModelHelper.getBoardFromContentValues(vals, b);
+            }
+        });
+    }
+
+    public void addTaskToBoard(String boardId, final ContentValues taskVals){
+        final Board b = mRealm.where(Board.class).equalTo(BoardsTable.COLUMN_BOARD_ID, boardId).findFirst();
+
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Task t = new Task();
+                DBModelHelper.getTaskFromContentValues(taskVals, t);
+                b.addTask(t);
+            }
+        });
+    }
 
     //get methods
 
@@ -107,44 +144,34 @@ public class DBHelper {
     }
 
 
-    //TODO
-//    public Cursor getTasksForBoard(int boardLocalId){
-//        SQLiteDatabase db = getReadableDatabase();
-//        String subColumns = String.format("%s.%s, %s.%s, %s.%s",
-//                TasksTable.TABLE_NAME, //1
-//                TasksTable._ID,  //2
-//                TasksTable.TABLE_NAME, //3
-//                TasksTable.COLUMN_DISPLAY_NAME, //4
-//                TasksTable.TABLE_NAME, //5
-//                TasksTable.COLUMN_TASK_ID //3
-//        );
-//        //Fetching columns from: tasks
-//        //Joining with: board task relation tables
-//        //On: board task relation has task id (all relationships for each task)
-//        //Filter by: relationship has board id provided
-//        String query = String.format("SELECT %s FROM %s JOIN %s ON %s.%s=%s.%s WHERE %s.%s=%s",
-//                subColumns, //1
-//                TasksTable.TABLE_NAME, //2
-//                TaskBoardRelationTable.TABLE_NAME, //3
-//                TasksTable.TABLE_NAME, //4
-//                TasksTable._ID, //5
-//                TaskBoardRelationTable.TABLE_NAME, //6
-//                TaskBoardRelationTable.COLUMN_TASK_LOCAL_ID, //7
-//                TaskBoardRelationTable.TABLE_NAME, //8
-//                TaskBoardRelationTable.COLUMN_BOARD_LOCAL_ID, //9
-//                boardLocalId //10
-//
-//
-//        );
-//        Cursor cursor = db.rawQuery(query, null);
-//        return cursor;
-//    }
+    public Cursor getTasksForBoard(String boardId){
+        Board b = mRealm.where(Board.class).equalTo(BoardsTable.COLUMN_BOARD_ID, boardId).findFirst();
+        MatrixCursor result = new MatrixCursor(TasksTable.COLUMNS);
+        for(Task t: b.getTasks()){
+            result.addRow(DBModelHelper.getTaskProperties(t));
+        }
+        return result;
+    }
 
     public Cursor getAllBoards(){
         MatrixCursor result = new MatrixCursor(BoardsTable.COLUMNS);
         for(Board b: mRealm.where(Board.class).findAll()){
             result.addRow(DBModelHelper.getBoardProperties(b));
         }
+        return result;
+    }
+
+    public Cursor getBoardById(String boardId){
+        Board b = mRealm.where(Board.class).equalTo(BoardsTable.COLUMN_BOARD_ID, boardId).findFirst();
+        MatrixCursor result = new MatrixCursor(BoardsTable.COLUMNS);
+        result.addRow(DBModelHelper.getBoardProperties(b));
+        return result;
+    }
+
+    public Cursor getTaskById(String taskId){
+        Task t = mRealm.where(Task.class).equalTo(TasksTable.COLUMN_TASK_ID, taskId).findFirst();
+        MatrixCursor result = new MatrixCursor(TasksTable.COLUMNS);
+        result.addRow(DBModelHelper.getTaskProperties(t));
         return result;
     }
 
