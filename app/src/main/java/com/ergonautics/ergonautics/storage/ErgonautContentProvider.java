@@ -11,7 +11,6 @@ import java.util.List;
 
 public class ErgonautContentProvider extends ContentProvider {
     private static final String TAG = "ERGONAUT-CP";
-    private DBHelper mDb;
     private static final String AUTHORITY = "com.ergonautics.ergonautics.ErgonautContentProvider";
     private static final String TASKS_TABLE = "tasks";
     private static final String BOARDS_TABLE = "boards";
@@ -32,7 +31,6 @@ public class ErgonautContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        mDb = new DBHelper(getContext());
         return true;
     }
 
@@ -53,15 +51,16 @@ public class ErgonautContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         //Check which model we are using and perform the insertion accordingly
         String id = "";
+        DBHelper db = new DBHelper(getContext());
         switch (sURIMatcher.match(uri)){
             case TASKS:
                 List<String> segments = uri.getPathSegments();
                 Log.d(TAG, "insert: " + segments.toString());
                 String boardId = segments.get(1);
-                mDb.createTask(values, boardId);
+                db.createTask(values, boardId);
                 break;
             case BOARDS:
-                mDb.createBoard(values);
+                db.createBoard(values);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid URI " + uri.toString());
@@ -73,14 +72,15 @@ public class ErgonautContentProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
         Cursor result = null;
+        DBHelper db = new DBHelper(getContext());
         //Check which model we are using and perform the insertion accordingly
         Log.d(TAG, "query: Got request for data at URI " + uri.toString());
         switch (sURIMatcher.match(uri)){
             case TASKS:
-                result = mDb.getAllTasks();
+                result = db.getAllTasks();
                 break;
             case BOARDS:
-                result = mDb.getAllBoards();
+                result = db.getAllBoards();
                 break;
             default:
                 throw new IllegalArgumentException("Invalid URI " + uri.toString());

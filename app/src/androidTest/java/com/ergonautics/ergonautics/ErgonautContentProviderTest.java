@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.DBModelHelper;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
@@ -31,12 +32,31 @@ public class ErgonautContentProviderTest {
 
     @Test
     public void testTaskInsert(){
+        Board b = new Board("Example Board with task");
+        ContentValues bVals = DBModelHelper.getContentValuesForBoard(b);
+        Uri uri = mResolver.insert(ErgonautContentProvider.BOARDS_INSERT_URI, bVals);
+        //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
+        String boardId = uri.getLastPathSegment();
+        assertTrue(boardId.length() > 4);
         Task t = new Task("Example Task");
         ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
         String uriString = ErgonautContentProvider.TASKS_INSERT_URI.toString();
-        uriString.replace("*", "12345"); //TODO: need an actual board id
-        Uri uri = mResolver.insert(ErgonautContentProvider.TASKS_INSERT_URI, tVals);
-        assertNotEquals("0", uri.getLastPathSegment());
+        uriString.replace("*", boardId);
+        Uri taskUri = mResolver.insert(Uri.parse(uriString), tVals);
+        //Ensure the task id is at least 4 digits
+        String taskId = taskUri.getLastPathSegment();
+        assertTrue(taskId.length() > 4);
+    }
+
+    @Test
+    public void testBoardInsert(){
+        Board b = new Board("Example Board");
+        ContentValues bVals = DBModelHelper.getContentValuesForBoard(b);
+        Uri uri = mResolver.insert(ErgonautContentProvider.BOARDS_INSERT_URI, bVals);
+        //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
+        String boardId = uri.getLastPathSegment();
+        assertTrue(boardId.length() > 4);
+
     }
 
     @After

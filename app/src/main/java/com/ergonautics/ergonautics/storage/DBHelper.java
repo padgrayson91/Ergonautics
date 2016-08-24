@@ -65,6 +65,7 @@ public class DBHelper {
      * @param taskVals ContentValues for the task to add
      */
     public String createTask(final ContentValues taskVals, final String boardId) {
+        //Since this is a new task, it needs a new id
         String id = UUID.randomUUID().toString();
         taskVals.put(TasksTable.COLUMN_TASK_ID, id);
         mRealm.executeTransaction(new Realm.Transaction() {
@@ -79,6 +80,7 @@ public class DBHelper {
     }
 
     public String createBoard(final ContentValues vals) {
+        //Since this is a new board, it needs a new id
         String id = UUID.randomUUID().toString();
         vals.put(BoardsTable.COLUMN_BOARD_ID, id);
         mRealm.executeTransaction(new Realm.Transaction() {
