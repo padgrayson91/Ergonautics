@@ -50,15 +50,28 @@ public class ErgonautContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        // Implement this to handle requests to delete one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        DBHelper db = new DBHelper(getContext());
+        int result = 0;
+        switch (sURIMatcher.match(uri)){
+            case TASKS:
+                String taskID = uri.getLastPathSegment();
+                result = db.deleteTaskById(taskID);
+                break;
+            case BOARDS:
+                String boardId = uri.getLastPathSegment();
+                result = db.deleteBoardById(boardId);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid URI " + uri.toString());
+        }
+        return result;
     }
 
     @Override
     public String getType(@NonNull Uri uri) {
-        // TODO: Implement this to handle requests for the MIME type of the data
-        // at the given URI.
+        //TODO: Implement this to handle requests to get the MIME type for a row.
         throw new UnsupportedOperationException("Not yet implemented");
+
     }
 
     @Override

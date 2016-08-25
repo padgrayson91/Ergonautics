@@ -16,6 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+
 import static android.support.test.InstrumentationRegistry.getContext;
 import static org.junit.Assert.*;
 
@@ -25,10 +27,15 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class ErgonautContentProviderTest {
     private ContentResolver mResolver;
+    private ArrayList<String> mCreatedTasks;
+    private ArrayList<String> mCreatedBoards;
 
     @Before
     public void setUp(){
         mResolver = getContext().getContentResolver();
+        //Lists to keep track of all of the ids of elements created during the test so they can be deleted
+        mCreatedTasks = new ArrayList<>();
+        mCreatedBoards = new ArrayList<>();
     }
 
     @Test
@@ -40,6 +47,7 @@ public class ErgonautContentProviderTest {
         String boardId = uri.getLastPathSegment();
         assertNotNull(boardId);
         assertTrue(boardId.length() > 4);
+        mCreatedBoards.add(boardId);
         Task t = new Task("Example Task");
         ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
         String uriString = ErgonautContentProvider.TASKS_INSERT_URI.toString();
@@ -49,6 +57,7 @@ public class ErgonautContentProviderTest {
         //Ensure the task id is at least 4 digits
         String taskId = taskUri.getLastPathSegment();
         assertTrue(taskId.length() > 4);
+        mCreatedTasks.add(taskId);
     }
 
     @Test
@@ -60,6 +69,7 @@ public class ErgonautContentProviderTest {
         //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
         String boardId = uri.getLastPathSegment();
         assertTrue(boardId.length() > 4);
+        mCreatedBoards.add(boardId);
 
     }
 
@@ -72,6 +82,7 @@ public class ErgonautContentProviderTest {
         //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
         String boardId = uri.getLastPathSegment();
         assertTrue(boardId.length() > 4);
+        mCreatedBoards.add(boardId);
         Cursor cursor = mResolver.query(ErgonautContentProvider.BOARDS_QUERY_URI, null, null, null, null);
         assertTrue(cursor.getCount() > 0);
     }
@@ -94,6 +105,7 @@ public class ErgonautContentProviderTest {
         //Ensure the task id is at least 4 digits
         String taskId = taskUri.getLastPathSegment();
         assertTrue(taskId.length() > 4);
+        mCreatedTasks.add(taskId);
 
         Cursor cursor = mResolver.query(ErgonautContentProvider.TASKS_QUERY_URI, null, null, null, null);
         assertTrue(cursor.getCount() > 0);
@@ -108,7 +120,7 @@ public class ErgonautContentProviderTest {
         //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
         String boardId = uri.getLastPathSegment();
         assertTrue(boardId.length() > 4);
-
+        mCreatedBoards.add(boardId);
         Cursor cursor = mResolver.query(Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, boardId), null, null, null, null);
         cursor.moveToFirst();
         assertEquals("Multiple boards retured from ID query!", cursor.getCount(), 1);
@@ -125,6 +137,7 @@ public class ErgonautContentProviderTest {
         String boardId = uri.getLastPathSegment();
         assertNotNull(boardId);
         assertTrue(boardId.length() > 4);
+        mCreatedBoards.add(boardId);
         Task t = new Task("Example Task to Query by ID");
         ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
         String uriString = ErgonautContentProvider.TASKS_INSERT_URI.toString();
@@ -134,6 +147,7 @@ public class ErgonautContentProviderTest {
         //Ensure the task id is at least 4 digits
         String taskId = taskUri.getLastPathSegment();
         assertTrue(taskId.length() > 4);
+        mCreatedTasks.add(taskId);
 
         Cursor cursor = mResolver.query(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, taskId), null, null, null, null);
         cursor.moveToFirst();
@@ -145,11 +159,28 @@ public class ErgonautContentProviderTest {
 
     @Test
     public void testTasksForBoardQuery(){
+        //TODO
+    }
 
+    @Test
+    public void testDeleteTask(){
+        //TODO
+    }
+
+    @Test
+    public void testDeleteBoard(){
+        //TODO
     }
 
     @After
     public void tearDown(){
+        for(String s: mCreatedTasks){
+            mResolver.delete(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, s), null, null);
+        }
+        for(String s: mCreatedBoards){
+            mResolver.delete(Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, s), null, null);
+        }
+
         mResolver = null;
     }
 }

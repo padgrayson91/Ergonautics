@@ -175,6 +175,31 @@ public class DBHelper {
         return result;
     }
 
+    //delete methods
+
+    public int deleteBoardById(String boardId){
+        try {
+            //TODO: before deleting a board, delete all tasks associated with only that board
+            mRealm.where(Board.class).equalTo(BoardsTable.COLUMN_BOARD_ID, boardId).findFirst().deleteFromRealm();
+            return 1;
+        } catch (NullPointerException ex) {
+            return 0;
+        }
+    }
+
+    public int deleteTaskById(String taskId){
+        try {
+            mRealm.where(Task.class).equalTo(TasksTable.COLUMN_TASK_ID, taskId).findFirst().deleteFromRealm();
+            return 1;
+        } catch (NullPointerException ex) {
+            return 0;
+        }
+    }
+
+    public void clearDb(){
+        mRealm.deleteAll();
+    }
+
 
 
 }

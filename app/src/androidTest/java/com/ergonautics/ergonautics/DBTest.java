@@ -9,6 +9,7 @@ import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.DBHelper;
 import com.ergonautics.ergonautics.storage.DBModelHelper;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -19,6 +20,7 @@ import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by patrickgrayson on 8/19/16.
+ * Tests for the DBHelper class
  */
 @RunWith(AndroidJUnit4.class)
 public class DBTest {
@@ -168,6 +170,24 @@ public class DBTest {
         getResult.moveToFirst();
         Task updatedTask = DBModelHelper.getTaskFromCursor(getResult);
         assertEquals("Example Task Updated", updatedTask.getDisplayName());
+    }
+
+    @Test
+    public void testDeleteTask(){
+        //TODO
+    }
+
+    @Test
+    public void testDeleteBoard(){
+        //TODO
+    }
+
+    @After
+    public void tearDown(){
+        db = new DBHelper(getTargetContext());
+        //Note: when running on a device or emulator, this will fully clear the db
+        //So probably to be avoided if you are also doing manual testing on the device
+        db.clearDb();
     }
 
 
