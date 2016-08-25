@@ -84,6 +84,7 @@ public class ErgonautContentProvider extends ContentProvider {
     }
 
     @Override
+    //TODO: support querying by other parameters
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
         Cursor result = null;

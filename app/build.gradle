@@ -27,6 +27,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.android.support:recyclerview-v7:24.0.0'
     //Added because of a bug in realm, but this should be removed when realm patches the bug
     compile 'io.reactivex:rxjava:1.1.0'
     androidTestCompile 'junit:junit:4.12'

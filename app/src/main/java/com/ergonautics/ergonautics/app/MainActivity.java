@@ -2,11 +2,14 @@ package com.ergonautics.ergonautics.app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.ergonautics.ergonautics.ErgonautAPI;
 import com.ergonautics.ergonautics.R;
+import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
+import com.ergonautics.ergonautics.view.TaskListFragment;
 
 /**
  * App main page where user can view active tasks, current boards, notifications, etc.
@@ -25,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
         if(!api.isLoggedIn()){
             //If the user is not logged in, go to the login activity
             switchToLoginActivity();
+        } else {
+            switchToLandingPage();
         }
     }
 
@@ -35,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_CODE_LOGIN:
                 if(resultCode == RESULT_OK){
                     //Login was successful
-                    //TODO: show user landing page
+                    switchToLandingPage();
                 } else {
                     //User hit back
                     finish();
@@ -44,6 +49,13 @@ public class MainActivity extends AppCompatActivity {
             default:
                 Log.d(TAG, "onActivityResult: unknown activity result");
         }
+    }
+
+    private void switchToLandingPage(){
+        TaskListFragment taskListFragment = TaskListFragment.getInstance(ErgonautContentProvider.TASKS_QUERY_URI.toString());
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.content, taskListFragment);
+        ft.commit();
     }
 
     private void switchToLoginActivity(){
