@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 
 import com.ergonautics.ergonautics.models.Board;
+import com.ergonautics.ergonautics.models.DBModelHelper;
 import com.ergonautics.ergonautics.models.Task;
 
 import java.util.UUID;
@@ -34,9 +35,16 @@ public class DBHelper {
         public static final String TABLE_NAME = "tasks";
         public static final String COLUMN_DISPLAY_NAME = "displayName"; //Name of task as displayed to user
         public static final String COLUMN_TASK_ID = "taskId"; //id of task obtained when it was added to the backend db
+        public static final String COLUMN_CREATED_AT =  "createdAt";
+        public static final String COLUMN_STARTED_AT = "startedAt";
+        public static final String COLUMN_COMPLETED_AT = "completedAt";
+        public static final String COLUMN_SCHEDULED_FOR = "scheduledFor";
+        public static final String COLUMN_TIME_ESTIMATE = "timeEstimate";
+        public static final String COLUMN_VALUE = "value";
 
         //NOTE: if adding a column, you must also update some methods in DBModelHelper
-        public static final String [] COLUMNS = {COLUMN_TASK_ID, COLUMN_DISPLAY_NAME};
+        public static final String [] COLUMNS = {COLUMN_TASK_ID, COLUMN_DISPLAY_NAME, COLUMN_CREATED_AT, COLUMN_STARTED_AT,
+            COLUMN_COMPLETED_AT, COLUMN_SCHEDULED_FOR, COLUMN_TIME_ESTIMATE, COLUMN_VALUE};
 
     }
 

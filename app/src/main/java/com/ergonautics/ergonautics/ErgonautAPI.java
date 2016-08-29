@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ergonautics.ergonautics.models.Board;
+import com.ergonautics.ergonautics.models.JsonModelHelper;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.LocalStorage;
 

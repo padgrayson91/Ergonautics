@@ -8,7 +8,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.Task;
-import com.ergonautics.ergonautics.storage.DBModelHelper;
+import com.ergonautics.ergonautics.models.DBModelHelper;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
 
 import org.junit.After;

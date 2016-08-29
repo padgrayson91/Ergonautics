@@ -1,23 +1,34 @@
-package com.ergonautics.ergonautics;
+package com.ergonautics.ergonautics.models;
 
-import com.ergonautics.ergonautics.models.Board;
-import com.ergonautics.ergonautics.models.Task;
+import android.util.Log;
+
+import com.ergonautics.ergonautics.ErgonautAPI;
+import com.ergonautics.ergonautics.utils.ReflectionUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
  * Created by patrickgrayson on 8/18/16.
  * Class to convert between Java model classes and JSON strings
  */
-class JsonModelHelper {
+public class JsonModelHelper {
+    private static final String TAG = "ERGONAUT-JSON";
+
     //JSON keys
     private static final String KEY_TASK = "task";
     private static final String KEY_TASK_NAME = "display_name";
     private static final String KEY_TASK_ID = "task_id";
+    private static final String KEY_TASK_CREATED_AT = "created_at";
+    private static final String KEY_TASK_STARTED_AT = "started_at";
+    private static final String KEY_TASK_SCHEDULED_FOR = "scheduled_for";
+    private static final String KEY_TASK_VALUE = "value";
+    private static final String KEY_TASK_TIME_ESTIMATE = "time_estimate";
     private static final String KEY_BOARD_NAME = "display_name";
     private static final String KEY_USERNAME_LOGIN = "username";
     private static final String KEY_USERNAME_REGISTER = "username";
@@ -30,6 +41,9 @@ class JsonModelHelper {
     private static final String KEY_GLOBAL_TASKS = "tasks";
     private static final String KEY_GLOBAL_BOARDS = "boards";
 
+    private static final String [] TASK_KEYS = {KEY_TASK_NAME, KEY_TASK_ID, KEY_TASK_CREATED_AT, KEY_TASK_STARTED_AT,
+        KEY_TASK_SCHEDULED_FOR, KEY_TASK_VALUE, KEY_TASK_TIME_ESTIMATE};
+
     /**
      *
      * @param t the task to parse
@@ -38,7 +52,12 @@ class JsonModelHelper {
     public static String getTaskAsJson(Task t) throws JSONException {
         JSONObject jobj = new JSONObject();
         jobj.put(KEY_TASK_NAME, t.getDisplayName());
-        //TODO: add more fields as needed
+        jobj.put(KEY_TASK_CREATED_AT, t.getCreatedAt());
+        jobj.put(KEY_TASK_ID, t.getTaskId());
+        jobj.put(KEY_TASK_SCHEDULED_FOR, t.getScheduledFor());
+        jobj.put(KEY_TASK_STARTED_AT, t.getStartedAt());
+        jobj.put(KEY_TASK_TIME_ESTIMATE, t.getTimeEstimate());
+        jobj.put(KEY_TASK_VALUE, t.getValue());
         return jobj.toString();
     }
 
@@ -81,10 +100,43 @@ class JsonModelHelper {
     public static Task getTaskFromJson(String json) throws JSONException {
         JSONObject jobj = new JSONObject(json);
         Task result = new Task(jobj.getString(KEY_TASK_NAME));
-        if(jobj.has(KEY_TASK_ID)){
-            result.setTaskId(jobj.getString(KEY_TASK_ID));
+        for(String key: TASK_KEYS) {
+            if (jobj.has(key)) {
+                try {
+                    Method setter = ReflectionUtils.getSetter(key, Task.class);
+                    Class fieldType = setter.getParameterTypes()[0];
+
+                    if(fieldType.equals(String.class)){
+                        String val = jobj.getString(key);
+                        setter.invoke(result, val);
+                    } else if(fieldType.equals(int.class) || fieldType.equals(Integer.class)){
+                        int val = jobj.getInt(key);
+                        setter.invoke(result, val);
+                    } else if(fieldType.equals(long.class) || fieldType.equals(Long.class)){
+                        //Long may be converted from double, so get object and cast
+                        Object temp = jobj.get(key);
+                        long val = (long) temp;
+                        setter.invoke(result, val);
+                    } else if(fieldType.equals(double.class) || fieldType.equals(Double.class)){
+                        double val = jobj.getDouble(key);
+                        setter.invoke(result, val);
+                    } else if(fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)){
+                        boolean val = jobj.getBoolean(key);
+                        setter.invoke(result, val);
+                    }
+                } catch (NoSuchMethodException e) {
+                    Log.e(TAG, "getTaskFromJson: invalid json key to setter conversion " + key);
+                } catch (InvocationTargetException e) {
+                    Log.e(TAG, "getTaskFromJson: unable to access setter for json conversion Task." + key);
+                } catch (IllegalAccessException e) {
+                    Log.e(TAG, "getTaskFromJson: setter is private or inaccessible Task." + key);
+                }
+            }
         }
-        //TODO: get more fields as needed
+
+        // NOTE: if Task has any complex data types added which are stored as JSONArrays/JSONObjects
+        // These must be extracted outside of the reflective method
+
         return result;
     }
 

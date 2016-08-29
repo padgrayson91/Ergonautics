@@ -7,7 +7,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.DBHelper;
-import com.ergonautics.ergonautics.storage.DBModelHelper;
+import com.ergonautics.ergonautics.models.DBModelHelper;
 
 import org.junit.After;
 import org.junit.Test;
@@ -34,6 +34,25 @@ public class DBTest {
         String id = db.createBoard(boardContent);
         assertNotNull(id);
     }
+
+    @Test
+    public void testTaskFromContentVals(){
+        ContentValues cv = new ContentValues();
+        cv.put(DBHelper.TasksTable.COLUMN_TASK_ID, "12345");
+        cv.put(DBHelper.TasksTable.COLUMN_DISPLAY_NAME, "Some task");
+        cv.put(DBHelper.TasksTable.COLUMN_COMPLETED_AT, -1L);
+        cv.put(DBHelper.TasksTable.COLUMN_CREATED_AT, -1L);
+        cv.put(DBHelper.TasksTable.COLUMN_SCHEDULED_FOR, -1L);
+        cv.put(DBHelper.TasksTable.COLUMN_STARTED_AT, -1L);
+        cv.put(DBHelper.TasksTable.COLUMN_TIME_ESTIMATE, 1000L * 60L *60L);
+        cv.put(DBHelper.TasksTable.COLUMN_VALUE, 100);
+        Task t = new Task("Hello World");
+
+        DBModelHelper.getTaskFromContentValues(cv, t);
+
+        assertEquals("Some task", t.getDisplayName());
+    }
+
 
     @Test
     public void testAddTask(){
@@ -184,10 +203,10 @@ public class DBTest {
 
     @After
     public void tearDown(){
-        db = new DBHelper(getTargetContext());
-        //Note: when running on a device or emulator, this will fully clear the db
-        //So probably to be avoided if you are also doing manual testing on the device
-        db.clearDb();
+//        db = new DBHelper(getTargetContext());
+//        //Note: when running on a device or emulator, this will fully clear the db
+//        //So probably to be avoided if you are also doing manual testing on the device
+//        db.clearDb();
     }
 
 

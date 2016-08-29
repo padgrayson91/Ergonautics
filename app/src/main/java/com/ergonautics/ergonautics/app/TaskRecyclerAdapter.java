@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 
 import com.ergonautics.ergonautics.R;
 import com.ergonautics.ergonautics.models.Task;
-import com.ergonautics.ergonautics.storage.DBModelHelper;
+import com.ergonautics.ergonautics.models.DBModelHelper;
 import com.ergonautics.ergonautics.view.TaskViewHolder;
 
 /**
