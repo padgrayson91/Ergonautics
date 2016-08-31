@@ -41,10 +41,11 @@ public class DBHelper {
         public static final String COLUMN_SCHEDULED_FOR = "scheduledFor";
         public static final String COLUMN_TIME_ESTIMATE = "timeEstimate";
         public static final String COLUMN_VALUE = "value";
+        public static final String COLUMN_STATUS = "status";
 
-        //NOTE: if adding a column, you must also update some methods in DBModelHelper
+        //NOTE: if adding a column, you must also add the field to Task.java along with getter and setter!
         public static final String [] COLUMNS = {COLUMN_TASK_ID, COLUMN_DISPLAY_NAME, COLUMN_CREATED_AT, COLUMN_STARTED_AT,
-            COLUMN_COMPLETED_AT, COLUMN_SCHEDULED_FOR, COLUMN_TIME_ESTIMATE, COLUMN_VALUE};
+            COLUMN_COMPLETED_AT, COLUMN_SCHEDULED_FOR, COLUMN_TIME_ESTIMATE, COLUMN_VALUE, COLUMN_STATUS};
 
     }
 
@@ -185,27 +186,40 @@ public class DBHelper {
 
     //delete methods
 
-    public int deleteBoardById(String boardId){
-        try {
-            //TODO: before deleting a board, delete all tasks associated with only that board
-            mRealm.where(Board.class).equalTo(BoardsTable.COLUMN_BOARD_ID, boardId).findFirst().deleteFromRealm();
-            return 1;
-        } catch (NullPointerException ex) {
-            return 0;
-        }
+    public int deleteBoardById(final String boardId){
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                try {
+                    //TODO: before deleting a board, delete all tasks associated with only that board
+                    realm.where(Board.class).equalTo(BoardsTable.COLUMN_BOARD_ID, boardId).findFirst().deleteFromRealm();
+                } catch (NullPointerException ex) {
+                }
+            }
+        });
+        return 1;
     }
 
-    public int deleteTaskById(String taskId){
-        try {
-            mRealm.where(Task.class).equalTo(TasksTable.COLUMN_TASK_ID, taskId).findFirst().deleteFromRealm();
-            return 1;
-        } catch (NullPointerException ex) {
-            return 0;
-        }
+    public int deleteTaskById(final String taskId){
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                try {
+                    realm.where(Task.class).equalTo(TasksTable.COLUMN_TASK_ID, taskId).findFirst().deleteFromRealm();
+                } catch (NullPointerException ex) {
+                }
+            }
+        });
+        return 1;
     }
 
     public void clearDb(){
-        mRealm.deleteAll();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.deleteAll();
+            }
+        });
     }
 
 

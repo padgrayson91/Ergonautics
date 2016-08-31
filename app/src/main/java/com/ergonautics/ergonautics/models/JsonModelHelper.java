@@ -29,6 +29,7 @@ public class JsonModelHelper {
     private static final String KEY_TASK_SCHEDULED_FOR = "scheduled_for";
     private static final String KEY_TASK_VALUE = "value";
     private static final String KEY_TASK_TIME_ESTIMATE = "time_estimate";
+    private static final String KEY_TASK_STATUS = "status";
     private static final String KEY_BOARD_NAME = "display_name";
     private static final String KEY_USERNAME_LOGIN = "username";
     private static final String KEY_USERNAME_REGISTER = "username";
@@ -40,9 +41,8 @@ public class JsonModelHelper {
     private static final String KEY_ERROR_CODE = "error_code";
     private static final String KEY_GLOBAL_TASKS = "tasks";
     private static final String KEY_GLOBAL_BOARDS = "boards";
-
     private static final String [] TASK_KEYS = {KEY_TASK_NAME, KEY_TASK_ID, KEY_TASK_CREATED_AT, KEY_TASK_STARTED_AT,
-        KEY_TASK_SCHEDULED_FOR, KEY_TASK_VALUE, KEY_TASK_TIME_ESTIMATE};
+        KEY_TASK_SCHEDULED_FOR, KEY_TASK_VALUE, KEY_TASK_TIME_ESTIMATE, KEY_TASK_STATUS};
 
     /**
      *
@@ -51,13 +51,18 @@ public class JsonModelHelper {
      */
     public static String getTaskAsJson(Task t) throws JSONException {
         JSONObject jobj = new JSONObject();
-        jobj.put(KEY_TASK_NAME, t.getDisplayName());
-        jobj.put(KEY_TASK_CREATED_AT, t.getCreatedAt());
-        jobj.put(KEY_TASK_ID, t.getTaskId());
-        jobj.put(KEY_TASK_SCHEDULED_FOR, t.getScheduledFor());
-        jobj.put(KEY_TASK_STARTED_AT, t.getStartedAt());
-        jobj.put(KEY_TASK_TIME_ESTIMATE, t.getTimeEstimate());
-        jobj.put(KEY_TASK_VALUE, t.getValue());
+        for(String key: TASK_KEYS){
+            try {
+                Method getter = ReflectionUtils.getGetter(key, Task.class);
+                jobj.put(key, getter.invoke(t));
+            } catch (NoSuchMethodException e) {
+                Log.e(TAG, "getTaskAsJson: Unable to get getter method for " + key);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         return jobj.toString();
     }
 
@@ -113,9 +118,11 @@ public class JsonModelHelper {
                         int val = jobj.getInt(key);
                         setter.invoke(result, val);
                     } else if(fieldType.equals(long.class) || fieldType.equals(Long.class)){
-                        //Long may be converted from double, so get object and cast
+                        //Long may be converted from double, so get as String and then remove any decimals
                         Object temp = jobj.get(key);
-                        long val = (long) temp;
+                        String tempStr = String.valueOf(temp);
+                        String withoutDecimals = tempStr.split("\\.")[0];
+                        long val = Long.valueOf(withoutDecimals);
                         setter.invoke(result, val);
                     } else if(fieldType.equals(double.class) || fieldType.equals(Double.class)){
                         double val = jobj.getDouble(key);

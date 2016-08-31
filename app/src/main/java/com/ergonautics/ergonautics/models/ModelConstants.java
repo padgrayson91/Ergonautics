@@ -12,4 +12,10 @@ interface ModelConstants {
     long SCHEDULED_FOR_DEFAULT = -1L;
     int VALUE_DEFAULT = 0;
     long TIME_ESTIMATE_DEFAULT = 1000L * 60L * 30L;  //30 minutes in milliseconds
+
+    //Task statuses (left here because they might eventually apply to other types of objects
+    int STATUS_UNSTARTED = 0;
+    int STATUS_IN_PROGRESS = 1;
+    int STATUS_COMPLETED = 2;
+    int STATUS_DEFUALT = STATUS_UNSTARTED;
 }

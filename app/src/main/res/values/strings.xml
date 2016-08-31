@@ -3,4 +3,7 @@
     <string name="text_button_login">Login</string>
     <string name="hint_edit_username">Username</string>
     <string name="hint_edit_password">Password</string>
+    <string name="text_button_next">Next</string>
+    <string name="text_button_prev">Previous</string>
+    <string name="text_button_submit">Submit</string>
 </resources>

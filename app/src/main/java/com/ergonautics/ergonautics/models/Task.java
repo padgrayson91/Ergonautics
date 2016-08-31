@@ -10,6 +10,7 @@ import io.realm.RealmObject;
  * Model class for user tasks
  */
 public class Task extends RealmObject implements ModelConstants, Serializable {
+    //NOTE: when adding a property, you must also add a column to DBHelper.TasksTable
     private String displayName;
     private String taskId; //Used for the remote API: May be null if user is offline
     private long createdAt;
@@ -18,6 +19,7 @@ public class Task extends RealmObject implements ModelConstants, Serializable {
     private long scheduledFor;
     private long timeEstimate; //Estimated amount of time in ms that this task will take
     private int value;
+    private int status;
 
     public Task(){
         displayName = DISPLAY_NAME_DEFAULT;
@@ -28,6 +30,7 @@ public class Task extends RealmObject implements ModelConstants, Serializable {
         scheduledFor = SCHEDULED_FOR_DEFAULT;
         value = VALUE_DEFAULT;
         timeEstimate = TIME_ESTIMATE_DEFAULT;
+        status = STATUS_DEFUALT;
     }
 
     public Task(String name){
@@ -39,6 +42,7 @@ public class Task extends RealmObject implements ModelConstants, Serializable {
         scheduledFor = SCHEDULED_FOR_DEFAULT;
         value = VALUE_DEFAULT;
         timeEstimate = TIME_ESTIMATE_DEFAULT;
+        status = STATUS_DEFUALT;
     }
 
     public String getDisplayName(){
@@ -102,5 +106,13 @@ public class Task extends RealmObject implements ModelConstants, Serializable {
 
     public void setTimeEstimate(long timeEstimate) {
         this.timeEstimate = timeEstimate;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
