@@ -42,4 +42,9 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> {
     public int getItemCount() {
         return mCursor.getCount();
     }
+
+    public void setCursor(Cursor updated) {
+        mCursor = updated;
+        notifyDataSetChanged();
+    }
 }

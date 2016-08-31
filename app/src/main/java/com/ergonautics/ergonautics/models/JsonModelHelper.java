@@ -37,12 +37,15 @@ public class JsonModelHelper {
     private static final String KEY_PASSWORD_REGISTER = "password";
     private static final String KEY_BOARD_ID = "board_id";
     private static final String KEY_BOARD_TASKS = "tasks";
+    private static final String KEY_BOARD_CREATED_AT = "created_at";
+    private static final String KEY_BOARD_LAST_MODIFIED = "last_modified";
     private static final String KEY_SESSION_TOKEN = "token";
     private static final String KEY_ERROR_CODE = "error_code";
     private static final String KEY_GLOBAL_TASKS = "tasks";
     private static final String KEY_GLOBAL_BOARDS = "boards";
     private static final String [] TASK_KEYS = {KEY_TASK_NAME, KEY_TASK_ID, KEY_TASK_CREATED_AT, KEY_TASK_STARTED_AT,
         KEY_TASK_SCHEDULED_FOR, KEY_TASK_VALUE, KEY_TASK_TIME_ESTIMATE, KEY_TASK_STATUS};
+    private static final String [] BOARD_KEYS = {KEY_BOARD_NAME, KEY_BOARD_ID, KEY_BOARD_TASKS, KEY_BOARD_CREATED_AT, KEY_BOARD_LAST_MODIFIED};
 
     /**
      *
@@ -87,13 +90,27 @@ public class JsonModelHelper {
      */
     public static String getBoardAsJson(Board b) throws JSONException {
         JSONObject jobj = new JSONObject();
-        jobj.put(KEY_BOARD_NAME, b.getDisplayName());
-        JSONArray tasks = new JSONArray();
-        for(Task t: b.getTasks()){
-            tasks.put(t.getTaskId());
+        for(String key: BOARD_KEYS){
+            //Special exception for tasks, because we only need the ids in the remote db
+            if(key.equals(KEY_BOARD_TASKS)){
+                JSONArray tasks = new JSONArray();
+                for(Task t: b.getTasks()){
+                    tasks.put(t.getTaskId());
+                }
+                jobj.put(KEY_BOARD_TASKS, tasks);
+            } else {
+                try {
+                    Method getter = ReflectionUtils.getGetter(key, Board.class);
+                    jobj.put(key, getter.invoke(b));
+                } catch (NoSuchMethodException e) {
+                    Log.e(TAG, "getBoardAsJson: Unable to get getter method for " + key);
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        jobj.put(KEY_BOARD_TASKS, tasks);
-        //TODO: add more fields as needed
         return jobj.toString();
     }
 
@@ -170,10 +187,41 @@ public class JsonModelHelper {
     public static Board getBoardFromJson(String json) throws JSONException {
         JSONObject jobj = new JSONObject(json);
         Board result = new Board(jobj.getString(KEY_BOARD_NAME));
-        if(jobj.has(KEY_BOARD_ID)){
-            result.setBoardId(jobj.getString(KEY_BOARD_ID));
+        for(String key: BOARD_KEYS) {
+            if (jobj.has(key)) {
+                try {
+                    Method setter = ReflectionUtils.getSetter(key, Board.class);
+                    Class fieldType = setter.getParameterTypes()[0];
+
+                    if(fieldType.equals(String.class)){
+                        String val = jobj.getString(key);
+                        setter.invoke(result, val);
+                    } else if(fieldType.equals(int.class) || fieldType.equals(Integer.class)){
+                        int val = jobj.getInt(key);
+                        setter.invoke(result, val);
+                    } else if(fieldType.equals(long.class) || fieldType.equals(Long.class)){
+                        //Long may be converted from double, so get as String and then remove any decimals
+                        Object temp = jobj.get(key);
+                        String tempStr = String.valueOf(temp);
+                        String withoutDecimals = tempStr.split("\\.")[0];
+                        long val = Long.valueOf(withoutDecimals);
+                        setter.invoke(result, val);
+                    } else if(fieldType.equals(double.class) || fieldType.equals(Double.class)){
+                        double val = jobj.getDouble(key);
+                        setter.invoke(result, val);
+                    } else if(fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)){
+                        boolean val = jobj.getBoolean(key);
+                        setter.invoke(result, val);
+                    }
+                } catch (NoSuchMethodException e) {
+                    Log.e(TAG, "getBoardFromJson: invalid json key to setter conversion " + key);
+                } catch (InvocationTargetException e) {
+                    Log.e(TAG, "getBoardFromJson: unable to access setter for json conversion " + key);
+                } catch (IllegalAccessException e) {
+                    Log.e(TAG, "getBoardFromJson: setter is private or inaccessible " + key);
+                }
+            }
         }
-        //TODO: get more fields as needed
         return result;
     }
 

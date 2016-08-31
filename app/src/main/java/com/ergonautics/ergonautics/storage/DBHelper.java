@@ -27,6 +27,7 @@ public class DBHelper {
     private static final int DATABASE_VERSION = 1;
 
     private Realm mRealm;
+    private static RealmConfiguration mRealmConfig;
     private Context mContext;
 
 
@@ -55,15 +56,27 @@ public class DBHelper {
         public static final String COLUMN_DISPLAY_NAME = "displayName"; //Name of board as displayed to user
         public static final String COLUMN_BOARD_ID = "boardId"; //id of board obtained when it was added to the backend db
         public static final String COLUMN_TASKS = "tasks";
+        public static final String COLUMN_CREATED_AT = "createdAt";
+        public static final String COLUMN_LAST_MODIFIED = "lastModified";
 
         //NOTE: if adding a column, you must also update some methods in DBModelHelper
-        public static final String [] COLUMNS = {COLUMN_BOARD_ID, COLUMN_DISPLAY_NAME, COLUMN_TASKS};
+        public static final String [] COLUMNS = {COLUMN_BOARD_ID, COLUMN_DISPLAY_NAME, COLUMN_TASKS, COLUMN_CREATED_AT, COLUMN_LAST_MODIFIED};
 
     }
 
     public DBHelper(Context context) {
         mContext = context;
-        RealmConfiguration mRealmConfig = new RealmConfiguration.Builder(mContext).build();
+        if(mRealmConfig == null) {
+            mRealmConfig = new RealmConfiguration.Builder(mContext)
+                    .initialData(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            Board first = realm.createObject(Board.class);
+                            first.setBoardId(UUID.randomUUID().toString());
+                        }
+                    })
+                    .build();
+        }
         mRealm = Realm.getInstance(mRealmConfig);
     }
 

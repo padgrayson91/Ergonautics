@@ -26,6 +26,8 @@ public class TaskListFragment extends Fragment {
     private RecyclerView mTasksRecycler;
     private FloatingActionButton mAddTaskButton;
     private ITaskListUpdateListener mTaskAddSelectedListener;
+    private TaskRecyclerAdapter mAdapter;
+    private Uri mQuery; //Each task list is designed to show exactly one query
 
     public static TaskListFragment getInstance(String query){
         TaskListFragment fragment = new TaskListFragment();
@@ -57,14 +59,19 @@ public class TaskListFragment extends Fragment {
         //Perform our db query to get a cursor
         Bundle args = getArguments();
         if(args != null){
-            Uri queryUri = Uri.parse(args.getString(ARGS_KEY_QUERY));
-            Cursor result = getContext().getContentResolver().query(queryUri, null, null, null, null);
-            TaskRecyclerAdapter adapter = new TaskRecyclerAdapter(result);
-            mTasksRecycler.setAdapter(adapter);
+            mQuery = Uri.parse(args.getString(ARGS_KEY_QUERY));
+            Cursor result = getContext().getContentResolver().query(mQuery, null, null, null, null);
+            mAdapter = new TaskRecyclerAdapter(result);
+            mTasksRecycler.setAdapter(mAdapter);
         } else {
             throw new IllegalStateException("Cannot initialize TaskListFragment with no arguments! Did you forget to use getInstance?");
         }
         return root;
+    }
+
+    public void updateTaskList(){
+        Cursor result = getContext().getContentResolver().query(mQuery, null, null, null, null);
+        mAdapter.setCursor(result);
     }
 
     private View.OnClickListener mAddTaskButtonListener = new View.OnClickListener() {

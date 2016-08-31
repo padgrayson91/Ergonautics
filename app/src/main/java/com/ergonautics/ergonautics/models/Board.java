@@ -1,6 +1,7 @@
 package com.ergonautics.ergonautics.models;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -12,18 +13,24 @@ import io.realm.RealmObject;
 public class Board extends RealmObject implements ModelConstants, Serializable {
     private RealmList<Task> tasks;
     private String displayName;
-    private String boardId; //Used by remote API: may be null if user created this board while offline
+    private String boardId;
+    private long createdAt;
+    private long lastModified;
 
     public Board(String displayName){
         this.displayName = displayName;
         tasks = new RealmList<>();
         boardId = REMOTE_ID_DEFAULT;
+        createdAt = new Date().getTime();
+        lastModified = new Date().getTime();
     }
 
     public Board(){
         displayName = DISPLAY_NAME_DEFAULT;
         boardId = REMOTE_ID_DEFAULT;
         tasks = new RealmList<>();
+        createdAt = new Date().getTime();
+        lastModified = new Date().getTime();
     }
 
     public String getDisplayName(){
@@ -46,5 +53,25 @@ public class Board extends RealmObject implements ModelConstants, Serializable {
 
     public void addTask(Task toAdd){
         tasks.add(toAdd);
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public void setTasks(RealmList<Task> tasks) {
+        this.tasks = tasks;
     }
 }

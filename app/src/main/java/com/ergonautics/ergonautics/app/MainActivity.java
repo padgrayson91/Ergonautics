@@ -1,6 +1,8 @@
 package com.ergonautics.ergonautics.app;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -11,8 +13,12 @@ import android.widget.Toast;
 
 import com.ergonautics.ergonautics.ErgonautAPI;
 import com.ergonautics.ergonautics.R;
+import com.ergonautics.ergonautics.models.Board;
+import com.ergonautics.ergonautics.models.DBModelHelper;
 import com.ergonautics.ergonautics.models.Task;
+import com.ergonautics.ergonautics.storage.DBHelper;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
+import com.ergonautics.ergonautics.storage.UriHelper;
 import com.ergonautics.ergonautics.view.AddTaskDialogFragment;
 import com.ergonautics.ergonautics.view.TaskListFragment;
 
@@ -21,6 +27,11 @@ import com.ergonautics.ergonautics.view.TaskListFragment;
  */
 public class MainActivity extends AppCompatActivity implements ITaskListUpdateListener {
     private static final String TAG = "ERGONAUT-MAIN";
+
+    //Fragment tags
+    private static final String FRAGMENT_TAG_TASK_LIST = "tasks";
+    private static final String FRAGMENT_TAG_TASK_CREATOR = "newtask";
+
     private static final int REQUEST_CODE_LOGIN = 1001;
 
     @Override
@@ -59,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
     private void switchToLandingPage(){
         TaskListFragment taskListFragment = TaskListFragment.getInstance(ErgonautContentProvider.TASKS_QUERY_URI.toString());
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.content, taskListFragment);
+        ft.add(R.id.content, taskListFragment, FRAGMENT_TAG_TASK_CREATOR);
         ft.commit();
     }
 
@@ -71,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
     @Override
     public void onAddTaskSelected() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_TASK_CREATOR);
         if (prev != null) {
             ft.remove(prev);
         }
@@ -79,13 +90,26 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
 
         // Create and show the dialog.
         DialogFragment newFragment = AddTaskDialogFragment.newInstance();
-        newFragment.show(ft, "dialog");
+        newFragment.show(ft, FRAGMENT_TAG_TASK_CREATOR);
     }
 
     @Override
     public void onTaskSubmitted(Task t) {
-        //TODO: add task to database
+        //TODO: should have a current board active when creating tasks, explicit DB Access here is a No No in general
+        Cursor allBoards = new DBHelper(MainActivity.this).getAllBoards();
+        allBoards.moveToFirst();
+        Board temp = DBModelHelper.getBoardFromCursor(allBoards);
+        allBoards.close();
+
+        Uri insertUri = UriHelper.getTaskInsertUri(temp.getBoardId());
+        getContentResolver().insert(insertUri, DBModelHelper.getContentValuesForTask(t));
         Toast.makeText(MainActivity.this, "New Task Added!", Toast.LENGTH_LONG).show();
+        try {
+            TaskListFragment tlf = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_TASK_LIST);
+            tlf.updateTaskList();
+        } catch (NullPointerException ex) {
+            Log.e(TAG, "onTaskSubmitted: Task list was no longer in fragment manager");
+        }
 
     }
 }

@@ -44,5 +44,7 @@ public class LoginActivity extends AppCompatActivity implements LoginTask.ILogin
     @Override
     public void onLoginComplete(int result) {
         Log.d(TAG, "onLoginComplete: notified of login completion with result " + result);
+        setResult(RESULT_OK);
+        finish();
     }
 }

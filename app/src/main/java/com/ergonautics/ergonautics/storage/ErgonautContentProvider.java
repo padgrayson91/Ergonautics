@@ -20,7 +20,8 @@ public class ErgonautContentProvider extends ContentProvider {
     private static final String BOARDS_INSERT_PATH = BOARDS_TABLE;
     private static final String TASKS_QUERY_PATH = TASKS_TABLE;
     private static final String BOARDS_QUERY_PATH = BOARDS_TABLE;
-    public static final Uri TASKS_INSERT_URI = Uri.parse(PREFIX
+    //This should only be accessed through the UriHelper since it needs to be manipulated before being used
+    protected static final Uri TASKS_INSERT_URI = Uri.parse(PREFIX
             + AUTHORITY + "/" + TASKS_INSERT_PATH);
     public static final Uri BOARDS_INSERT_URI = Uri.parse(PREFIX
             + AUTHORITY + "/" + BOARDS_INSERT_PATH);

@@ -2,6 +2,7 @@ package com.ergonautics.ergonautics;
 
 import android.support.test.runner.AndroidJUnit4;
 
+import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.JsonModelHelper;
 import com.ergonautics.ergonautics.models.Task;
 
@@ -10,7 +11,8 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by patrickgrayson on 8/29/16.
@@ -61,11 +63,36 @@ public class JsonModelHelperTest2 {
 
     @Test
     public void testBoardFromJson(){
-        //TODO
+        String jstring = "{\"display_name\":\"Some Board\", \"created_at\":12345567, " +
+                "\"board_id\":\"23e3fd827\"," +
+                "\"tasks\":[], \"last_modified\":12345569}";
+
+        try {
+            Board b = JsonModelHelper.getBoardFromJson(jstring);
+            assertEquals("23e3fd827", b.getBoardId());
+            assertEquals(12345569, b.getLastModified());
+        } catch (JSONException e) {
+            assertTrue(false);
+        }
+
+
     }
 
     @Test
     public void testJsonFromBoard(){
-        //TODO
+        Board b = new Board("Some Board");
+        b.setBoardId("135fda77a65a6");
+        b.setCreatedAt(124532L);
+        b.setLastModified(124539L);
+        b.addTask(new Task("Some Task"));
+
+        try {
+            String jstring = JsonModelHelper.getBoardAsJson(b);
+            JSONObject jobj = new JSONObject(jstring);
+            assertEquals(124539, jobj.getLong("last_modified"));
+            assertEquals("135fda77a65a6", jobj.getString("board_id"));
+        } catch (JSONException e) {
+            assertTrue(false);
+        }
     }
 }
