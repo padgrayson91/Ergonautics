@@ -4,14 +4,18 @@ import android.content.ContentValues;
 import android.database.MatrixCursor;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.DBModelHelper;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.DBHelper;
+import com.ergonautics.ergonautics.storage.Serializer;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+
+import io.realm.RealmList;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -85,16 +89,52 @@ public class DBModelHelperTest2 {
 
     @Test
     public void testBoardFromContentVals(){
-        //TODO
+        ContentValues cv = new ContentValues();
+        cv.put(DBHelper.BoardsTable.COLUMN_BOARD_ID, "12345");
+        cv.put(DBHelper.BoardsTable.COLUMN_DISPLAY_NAME, "Some Board");
+        cv.put(DBHelper.BoardsTable.COLUMN_CREATED_AT, 123973791L);
+        cv.put(DBHelper.BoardsTable.COLUMN_LAST_MODIFIED, -1L);
+        cv.put(DBHelper.BoardsTable.COLUMN_TASKS, Serializer.serialize(new RealmList<Task>()));
+        Board b = new Board("");
+
+        DBModelHelper.getBoardFromContentValues(cv, b);
+
+        assertEquals("12345", b.getBoardId());
+        assertEquals(123973791, b.getCreatedAt());
     }
 
     @Test
     public void testPropertiesForBoard(){
-        //TODO
+        Board b = new Board("Some Board");
+        b.setBoardId("12343a1224");
+        b.setCreatedAt(1249719247L);
+        b.setLastModified(124581972L);
+        b.setTasks(new RealmList<Task>());
+        Object[] props = DBModelHelper.getBoardProperties(b);
+        ArrayList<String> columnsAsArrayList = new ArrayList<>(DBHelper.BoardsTable.COLUMNS.length);
+        for(String s: DBHelper.BoardsTable.COLUMNS){
+            columnsAsArrayList.add(s);
+        }
+        assertEquals("12343a1224", props[columnsAsArrayList.indexOf(DBHelper.BoardsTable.COLUMN_BOARD_ID)]);
+        assertEquals(124581972L, props[columnsAsArrayList.indexOf(DBHelper.BoardsTable.COLUMN_LAST_MODIFIED)]);
     }
 
     @Test
     public void testBoardFromCursor(){
-        //TODO
+        Board b = new Board("Some Board");
+        b.setBoardId("12343a1224");
+        b.setCreatedAt(1249719247L);
+        b.setLastModified(124581972L);
+        b.setTasks(new RealmList<Task>());
+        Object[] props = DBModelHelper.getBoardProperties(b);
+        ArrayList<String> columnsAsArrayList = new ArrayList<>(DBHelper.BoardsTable.COLUMNS.length);
+        for(String s: DBHelper.BoardsTable.COLUMNS){
+            columnsAsArrayList.add(s);
+        }
+        MatrixCursor c = new MatrixCursor(DBHelper.BoardsTable.COLUMNS);
+        c.addRow(props);
+        c.moveToFirst();
+        Board result = DBModelHelper.getBoardFromCursor(c);
+        assertEquals(1249719247L, result.getCreatedAt());
     }
 }

@@ -20,8 +20,10 @@ public class ErgonautContentProvider extends ContentProvider {
     private static final String BOARDS_INSERT_PATH = BOARDS_TABLE;
     private static final String TASKS_QUERY_PATH = TASKS_TABLE;
     private static final String BOARDS_QUERY_PATH = BOARDS_TABLE;
-    //This should only be accessed through the UriHelper since it needs to be manipulated before being used
+    //These should only be accessed through the UriHelper since it needs to be manipulated before being used
     protected static final Uri TASKS_INSERT_URI = Uri.parse(PREFIX
+            + AUTHORITY + "/" + TASKS_INSERT_PATH);
+    protected static final Uri TASKS_FOR_BOARD_QUERY_URI = Uri.parse(PREFIX
             + AUTHORITY + "/" + TASKS_INSERT_PATH);
     public static final Uri BOARDS_INSERT_URI = Uri.parse(PREFIX
             + AUTHORITY + "/" + BOARDS_INSERT_PATH);
@@ -51,6 +53,7 @@ public class ErgonautContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+        Log.d(TAG, "delete: " + uri.toString());
         DBHelper db = new DBHelper(getContext());
         int result = 0;
         switch (sURIMatcher.match(uri)){
@@ -112,8 +115,12 @@ public class ErgonautContentProvider extends ContentProvider {
                     //Request for all tasks
                     result = db.getAllTasks();
                 } else {
+                    Log.d(TAG, "query: getting task by id");
                     String id = uri.getLastPathSegment();
                     result = db.getTaskById(id);
+                    if(result.getCount() > 1){
+                        Log.e(TAG, "query: ERROR - Multiple tasks returned for ID " + id);
+                    }
                 }
                 break;
             case BOARDS:

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.util.Log;
 
 import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.DBModelHelper;
@@ -90,14 +91,9 @@ public class DBHelper {
     public String createTask(final ContentValues taskVals, final String boardId) {
         //Since this is a new task, it needs a new id
         String id = UUID.randomUUID().toString();
+
+
         taskVals.put(TasksTable.COLUMN_TASK_ID, id);
-        mRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Task t = realm.createObject(Task.class);
-                DBModelHelper.getTaskFromContentValues(taskVals, t);
-            }
-        });
         addTaskToBoard(boardId, taskVals);
         return id;
 
@@ -147,7 +143,7 @@ public class DBHelper {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                Task t = new Task();
+                Task t = realm.createObject(Task.class);
                 DBModelHelper.getTaskFromContentValues(taskVals, t);
                 b.addTask(t);
             }
@@ -186,14 +182,19 @@ public class DBHelper {
     public Cursor getBoardById(String boardId){
         Board b = mRealm.where(Board.class).equalTo(BoardsTable.COLUMN_BOARD_ID, boardId).findFirst();
         MatrixCursor result = new MatrixCursor(BoardsTable.COLUMNS);
-        result.addRow(DBModelHelper.getBoardProperties(b));
+        if(b != null) {
+            result.addRow(DBModelHelper.getBoardProperties(b));
+        }
         return result;
     }
 
     public Cursor getTaskById(String taskId){
         Task t = mRealm.where(Task.class).equalTo(TasksTable.COLUMN_TASK_ID, taskId).findFirst();
         MatrixCursor result = new MatrixCursor(TasksTable.COLUMNS);
-        result.addRow(DBModelHelper.getTaskProperties(t));
+        if(t != null) {
+            result.addRow(DBModelHelper.getTaskProperties(t));
+        }
+        Log.d(TAG, "getTaskById: " + result.getCount() + " task(s) fetched for id " + taskId);
         return result;
     }
 
@@ -214,6 +215,7 @@ public class DBHelper {
     }
 
     public int deleteTaskById(final String taskId){
+        Log.d(TAG, "deleteTaskById: Got request to delete task with ID " + taskId);
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

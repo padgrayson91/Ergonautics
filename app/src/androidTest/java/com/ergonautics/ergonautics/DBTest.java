@@ -175,12 +175,43 @@ public class DBTest {
 
     @Test
     public void testDeleteTask(){
-        //TODO
+        db = new DBHelper(getTargetContext());
+        Board toAdd = new Board("Example Board with Task");
+        ContentValues boardContent = DBModelHelper.getContentValuesForBoard(toAdd);
+        String boardId = db.createBoard(boardContent);
+        assertNotNull(boardId);
+        Task taskToAdd = new Task("Example Task to Delete");
+        ContentValues taskContent = DBModelHelper.getContentValuesForTask(taskToAdd);
+        String id = db.createTask(taskContent, boardId);
+        assertNotNull(id);
+        Cursor before = db.getAllTasks();
+        before.moveToFirst();
+        int beforeCount = 0;
+        while(!before.isAfterLast()){
+            Task resultTask = DBModelHelper.getTaskFromCursor(before);
+            if(resultTask.getTaskId().equals(id)){
+                beforeCount++;
+            }
+            before.moveToNext();
+        }
+        before.close();
+        db.deleteTaskById(id);
+        Cursor c = db.getTaskById(id);
+        assertEquals(beforeCount - 1, c.getCount());
+        c.close();
     }
 
     @Test
     public void testDeleteBoard(){
-        //TODO
+        db = new DBHelper(getTargetContext());
+        Board toAdd = new Board("Example Board to Delete");
+        ContentValues boardContent = DBModelHelper.getContentValuesForBoard(toAdd);
+        String id = db.createBoard(boardContent);
+        assertNotNull(id);
+
+        db.deleteBoardById(id);
+        Cursor c = db.getBoardById(id);
+        assertEquals(0, c.getCount());
     }
 
     @After

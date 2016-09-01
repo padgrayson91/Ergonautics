@@ -13,4 +13,10 @@ public class UriHelper {
         return Uri.parse(fullString);
     }
 
+    public static Uri getTaskForBoardQueryUri(String boardId){
+        String baseString = ErgonautContentProvider.TASKS_FOR_BOARD_QUERY_URI.toString();
+        String fullString = baseString.replace("*", boardId);
+        return Uri.parse(fullString);
+    }
+
 }

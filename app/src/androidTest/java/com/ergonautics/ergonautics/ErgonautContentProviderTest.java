@@ -7,9 +7,10 @@ import android.net.Uri;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.ergonautics.ergonautics.models.Board;
-import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.models.DBModelHelper;
+import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
+import com.ergonautics.ergonautics.storage.UriHelper;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,7 +20,9 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 
 import static android.support.test.InstrumentationRegistry.getContext;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by patrickgrayson on 8/19/16.
@@ -50,9 +53,8 @@ public class ErgonautContentProviderTest {
         mCreatedBoards.add(boardId);
         Task t = new Task("Example Task");
         ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
-        String uriString = ErgonautContentProvider.TASKS_INSERT_URI.toString();
-        uriString = uriString.replace("*", boardId);
-        Uri taskUri = mResolver.insert(Uri.parse(uriString), tVals);
+        Uri insertURI = UriHelper.getTaskInsertUri(boardId);
+        Uri taskUri = mResolver.insert(insertURI, tVals);
         assertNotNull(taskUri);
         //Ensure the task id is at least 4 digits
         String taskId = taskUri.getLastPathSegment();
@@ -98,9 +100,8 @@ public class ErgonautContentProviderTest {
         assertTrue(boardId.length() > 4);
         Task t = new Task("Example Task");
         ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
-        String uriString = ErgonautContentProvider.TASKS_INSERT_URI.toString();
-        uriString = uriString.replace("*", boardId);
-        Uri taskUri = mResolver.insert(Uri.parse(uriString), tVals);
+        Uri insertURI = UriHelper.getTaskInsertUri(boardId);
+        Uri taskUri = mResolver.insert(insertURI, tVals);
         assertNotNull(taskUri);
         //Ensure the task id is at least 4 digits
         String taskId = taskUri.getLastPathSegment();
@@ -140,9 +141,8 @@ public class ErgonautContentProviderTest {
         mCreatedBoards.add(boardId);
         Task t = new Task("Example Task to Query by ID");
         ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
-        String uriString = ErgonautContentProvider.TASKS_INSERT_URI.toString();
-        uriString = uriString.replace("*", boardId);
-        Uri taskUri = mResolver.insert(Uri.parse(uriString), tVals);
+        Uri insertURI = UriHelper.getTaskInsertUri(boardId);
+        Uri taskUri = mResolver.insert(insertURI, tVals);
         assertNotNull(taskUri);
         //Ensure the task id is at least 4 digits
         String taskId = taskUri.getLastPathSegment();
@@ -159,17 +159,99 @@ public class ErgonautContentProviderTest {
 
     @Test
     public void testTasksForBoardQuery(){
-        //TODO
+        Board b = new Board("Example Board with multiple tasks");
+        ContentValues bVals = DBModelHelper.getContentValuesForBoard(b);
+        Uri uri = mResolver.insert(ErgonautContentProvider.BOARDS_INSERT_URI, bVals);
+        //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
+        String boardId = uri.getLastPathSegment();
+        assertNotNull(boardId);
+        assertTrue(boardId.length() > 4);
+        mCreatedBoards.add(boardId);
+        Task t = new Task("Example Task 1");
+        ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
+        Uri insertURI = UriHelper.getTaskInsertUri(boardId);
+        Uri taskUri = mResolver.insert(insertURI, tVals);
+        assertNotNull(taskUri);
+        //Ensure the task id is at least 4 digits
+        String taskId = taskUri.getLastPathSegment();
+        assertTrue(taskId.length() > 4);
+        mCreatedTasks.add(taskId);
+        Task t2 = new Task("Example Task 2");
+        tVals = DBModelHelper.getContentValuesForTask(t2);
+        taskUri = mResolver.insert(insertURI, tVals);
+        assertNotNull(taskUri);
+        //Ensure the task id is at least 4 digits
+        taskId = taskUri.getLastPathSegment();
+        assertTrue(taskId.length() > 4);
+        mCreatedTasks.add(taskId);
+
+        Uri getTasksForBoard = UriHelper.getTaskForBoardQueryUri(boardId);
+        Cursor tasks = mResolver.query(getTasksForBoard, null, null, null, null);
+        tasks.moveToFirst();
+        assertEquals(2, tasks.getCount());
+        while(!tasks.isAfterLast()){
+            Task task = DBModelHelper.getTaskFromCursor(tasks);
+            assertTrue(mCreatedTasks.contains(task.getTaskId()));
+            tasks.moveToNext();
+        }
+        tasks.close();
     }
 
     @Test
     public void testDeleteTask(){
-        //TODO
+        Board b = new Board("Example Board with task");
+        ContentValues bVals = DBModelHelper.getContentValuesForBoard(b);
+        Uri uri = mResolver.insert(ErgonautContentProvider.BOARDS_INSERT_URI, bVals);
+        //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
+        String boardId = uri.getLastPathSegment();
+        assertNotNull(boardId);
+        assertTrue(boardId.length() > 4);
+        mCreatedBoards.add(boardId);
+        Task t = new Task("Example Task");
+        ContentValues tVals = DBModelHelper.getContentValuesForTask(t);
+        Uri insertURI = UriHelper.getTaskInsertUri(boardId);
+        Uri taskUri = mResolver.insert(insertURI, tVals);
+        assertNotNull(taskUri);
+        //Ensure the task id is at least 4 digits
+        String taskId = taskUri.getLastPathSegment();
+        assertTrue(taskId.length() > 4);
+        mCreatedTasks.add(taskId);
+
+        Uri deleteUri = Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, taskId);
+        mResolver.delete(deleteUri, null, null);
+
+        Uri queryUri = Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, taskId);
+        Cursor empty = mResolver.query(queryUri, null, null, null, null);
+        Task shouldNotExist = new Task("Blah");
+        if(empty.getCount() != 0){
+            empty.moveToFirst();
+            shouldNotExist = DBModelHelper.getTaskFromCursor(empty);
+        }
+        assertEquals("Task in cursor: " + shouldNotExist.getDisplayName(), 0, empty.getCount());
+        empty.close();
+
+        mCreatedTasks.remove(taskId);
     }
 
     @Test
     public void testDeleteBoard(){
-        //TODO
+        Board b = new Board("Example Board to Query by Id");
+        ContentValues bVals = DBModelHelper.getContentValuesForBoard(b);
+        Uri uri = mResolver.insert(ErgonautContentProvider.BOARDS_INSERT_URI, bVals);
+        assertNotNull(uri);
+        //Ensure the last segment of the path (i.e. the board id) is longer than 4 digits
+        String boardId = uri.getLastPathSegment();
+        assertTrue(boardId.length() > 4);
+        mCreatedBoards.add(boardId);
+
+        Uri deleteUri = Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, boardId);
+        mResolver.delete(deleteUri, null, null);
+
+        Cursor cursor = mResolver.query(Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, boardId), null, null, null, null);
+        assertEquals(0, cursor.getCount());
+        cursor.close();
+
+        mCreatedBoards.remove(boardId);
     }
 
     @After
@@ -180,6 +262,8 @@ public class ErgonautContentProviderTest {
         for(String s: mCreatedBoards){
             mResolver.delete(Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, s), null, null);
         }
+        mCreatedTasks = new ArrayList<>();
+        mCreatedBoards = new ArrayList<>();
 
         mResolver = null;
     }

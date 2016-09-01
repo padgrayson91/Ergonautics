@@ -269,8 +269,35 @@ public class DBModelHelper {
     public static Board getBoardFromCursor(Cursor c){
         String displayName = c.getString(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_DISPLAY_NAME));
         Board b = new Board(displayName);
-        String boardId = c.getString(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_BOARD_ID));
-        b.setBoardId(boardId);
+        for(String key: DBHelper.BoardsTable.COLUMNS){
+            try {
+                Method setter = ReflectionUtils.getSetter(key, Board.class);
+                Class fieldType = setter.getParameterTypes()[0];
+
+                if(fieldType.equals(String.class)){
+                    String val = c.getString(c.getColumnIndex(key));
+                    setter.invoke(b, val);
+                } else if(fieldType.equals(int.class) || fieldType.equals(Integer.class)){
+                    int val = c.getInt(c.getColumnIndex(key));
+                    setter.invoke(b, val);
+                } else if(fieldType.equals(long.class) || fieldType.equals(Long.class)){
+                    long val = c.getLong(c.getColumnIndex(key));
+                    setter.invoke(b, val);
+                } else if(fieldType.equals(double.class) || fieldType.equals(Double.class)){
+                    double val = c.getDouble(c.getColumnIndex(key));
+                    setter.invoke(b, val);
+                } else if(fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)){
+                    boolean val = Boolean.valueOf(c.getString(c.getColumnIndex(key)));
+                    setter.invoke(b, val);
+                }
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         RealmList<Task> tasks = (RealmList<Task>) Serializer.deserialize(c.getBlob(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_TASKS)));
         for(Task t: tasks){
             b.addTask(t);
