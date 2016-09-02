@@ -1,5 +1,7 @@
 package com.ergonautics.ergonautics.models;
 
+import org.json.JSONException;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -114,5 +116,14 @@ public class Task extends RealmObject implements ModelConstants, Serializable {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return JsonModelHelper.getTaskAsJson(this);
+        } catch (JSONException e) {
+            return "Invalid JSON conversion";
+        }
     }
 }

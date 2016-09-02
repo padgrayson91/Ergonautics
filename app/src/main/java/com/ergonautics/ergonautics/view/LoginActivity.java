@@ -1,4 +1,4 @@
-package com.ergonautics.ergonautics.app;
+package com.ergonautics.ergonautics.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.ergonautics.ergonautics.R;
+import com.ergonautics.ergonautics.app.LoginTask;
 
 
 /**

@@ -8,4 +8,10 @@
     <dimen name="floating_action_button_height">78dp</dimen>
     <dimen name="floating_action_button_width">78dp</dimen>
     <dimen name="recycler_item_padding">8dp</dimen>
+    <dimen name="text_size_small">8pt</dimen>
+    <dimen name="text_size_medium">12pt</dimen>
+    <dimen name="text_size_large">14pt</dimen>
+    <dimen name="text_size_xlarge">16pt</dimen>
+    <dimen name="header_min_height">120dp</dimen>
+    <dimen name="footer_min_height">120dp</dimen>
 </resources>

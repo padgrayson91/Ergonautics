@@ -2,7 +2,6 @@ package com.ergonautics.ergonautics.view;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +15,7 @@ import android.view.ViewGroup;
 import com.ergonautics.ergonautics.R;
 import com.ergonautics.ergonautics.app.ITaskListUpdateListener;
 import com.ergonautics.ergonautics.app.TaskRecyclerAdapter;
+import com.ergonautics.ergonautics.presenter.TaskPresenter;
 
 /**
  * Created by patrickgrayson on 8/24/16.
@@ -27,7 +27,8 @@ public class TaskListFragment extends Fragment {
     private FloatingActionButton mAddTaskButton;
     private ITaskListUpdateListener mTaskAddSelectedListener;
     private TaskRecyclerAdapter mAdapter;
-    private Uri mQuery; //Each task list is designed to show exactly one query
+
+    private static TaskPresenter mPresenter;
 
     public static TaskListFragment getInstance(String query){
         TaskListFragment fragment = new TaskListFragment();
@@ -56,21 +57,29 @@ public class TaskListFragment extends Fragment {
         mAddTaskButton = (FloatingActionButton) root.findViewById(R.id.button_add_task);
         mAddTaskButton.setOnClickListener(mAddTaskButtonListener);
 
-        //Perform our db query to get a cursor
-        Bundle args = getArguments();
-        if(args != null){
-            mQuery = Uri.parse(args.getString(ARGS_KEY_QUERY));
-            Cursor result = getContext().getContentResolver().query(mQuery, null, null, null, null);
-            mAdapter = new TaskRecyclerAdapter(result);
-            mTasksRecycler.setAdapter(mAdapter);
-        } else {
-            throw new IllegalStateException("Cannot initialize TaskListFragment with no arguments! Did you forget to use getInstance?");
+        if(mPresenter == null) {
+            //Perform our db query to get a cursor
+            Bundle args = getArguments();
+            if (args != null) {
+                String query = args.getString(ARGS_KEY_QUERY);
+                mPresenter = new TaskPresenter(query, getContext());
+            } else {
+                throw new IllegalStateException("Cannot initialize TaskListFragment with no arguments! Did you forget to use getInstance?");
+            }
         }
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Cursor result = mPresenter.present();
+        mAdapter = new TaskRecyclerAdapter(result);
+        mTasksRecycler.setAdapter(mAdapter);
+    }
+
     public void updateTaskList(){
-        Cursor result = getContext().getContentResolver().query(mQuery, null, null, null, null);
+        Cursor result = mPresenter.present();
         mAdapter.setCursor(result);
     }
 

@@ -298,7 +298,12 @@ public class DBModelHelper {
                 e.printStackTrace();
             }
         }
-        RealmList<Task> tasks = (RealmList<Task>) Serializer.deserialize(c.getBlob(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_TASKS)));
+        RealmList<Task> tasks;
+        try {
+            tasks = (RealmList<Task>) Serializer.deserialize(c.getBlob(c.getColumnIndex(DBHelper.BoardsTable.COLUMN_TASKS)));
+        } catch (NullPointerException ex){
+            tasks = new RealmList<>();
+        }
         for(Task t: tasks){
             b.addTask(t);
         }

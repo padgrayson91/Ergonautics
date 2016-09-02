@@ -2,16 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <TextView
+        android:minHeight="@dimen/header_min_height"
+        android:id="@+id/text_header"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:textSize="@dimen/text_size_large"
+        android:gravity="center"/>
     <android.support.v4.view.ViewPager
         android:id="@+id/pager_task_creation"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="9"></android.support.v4.view.ViewPager>
+        android:layout_weight="8"></android.support.v4.view.ViewPager>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:minHeight="@dimen/footer_min_height">
         <Button
             android:id="@+id/button_prev"
             android:layout_width="0dp"

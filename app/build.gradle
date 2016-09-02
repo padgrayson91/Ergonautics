@@ -25,15 +25,16 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.android.support:recyclerview-v7:24.0.0'
-    compile 'com.android.support:cardview-v7:24.0.+'
-    compile 'com.android.support:design:24.0.+'
     //Added because of a bug in realm, but this should be removed when realm patches the bug
-    compile 'io.reactivex:rxjava:1.1.0'
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test:runner:0.3') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.android.support:recyclerview-v7:24.0.0'
+    compile 'com.android.support:cardview-v7:24.0.0'
+    compile 'com.android.support:design:24.0.0'
+    compile 'io.reactivex:rxjava:1.1.0'
+    compile 'com.android.support:support-v4:24.0.0'
 }

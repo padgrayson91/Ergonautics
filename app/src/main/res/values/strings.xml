@@ -6,4 +6,14 @@
     <string name="text_button_next">Next</string>
     <string name="text_button_prev">Previous</string>
     <string name="text_button_submit">Submit</string>
+    <string name="text_header_name_task">What do you need to do?</string>
+    <string name="text_header_time_estimate_task">How long will that take?</string>
+
+    <string-array name="array_time_suggestions">
+        <item>15 minutes|900000</item>
+        <item>30 minutes|1800000</item>
+        <item>45 minutes|2700000</item>
+        <item>1 hour|3600000</item>
+        <item>2 hours|4500000</item>
+    </string-array>
 </resources>
