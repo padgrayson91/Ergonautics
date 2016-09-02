@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
         TaskListFragment tlf = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_TASK_LIST);
         if(tlf != null){
             Log.d(TAG, "switchToTaskList: Updating task list");
-            tlf.updateTaskList();
+            //tlf.updateTaskList();
         } else {
             Log.d(TAG, "switchToTaskList: Creating new task list fragment");
             TaskListFragment taskListFragment = TaskListFragment.getInstance(queryString);

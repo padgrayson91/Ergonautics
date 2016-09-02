@@ -55,7 +55,11 @@ public class TaskTimeEstimateFragment extends Fragment {
     }
 
     public long getSelection(){
-        return mTimeOptions[mTimeOptionsRadioGroup.indexOfChild(mTimeOptionsRadioGroup.findViewById(mTimeOptionsRadioGroup.getCheckedRadioButtonId()))];
+        try {
+            return mTimeOptions[mTimeOptionsRadioGroup.indexOfChild(mTimeOptionsRadioGroup.findViewById(mTimeOptionsRadioGroup.getCheckedRadioButtonId()))];
+        } catch (IndexOutOfBoundsException ex){
+            return 1000L * 60L * 30L;
+        }
     }
 
 }

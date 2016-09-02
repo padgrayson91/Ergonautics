@@ -23,7 +23,7 @@ public class AddTaskActivity extends AppCompatActivity implements ITaskListUpdat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
         if(mPresenter == null){
-            mPresenter = new TaskPresenter(null, this);
+            mPresenter = new TaskPresenter(null, this, null);
         }
     }
 
