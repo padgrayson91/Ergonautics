@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.Sort;
 
 /**
  * Created by patrickgrayson on 8/18/16.
@@ -44,10 +45,14 @@ public class DBHelper {
         public static final String COLUMN_TIME_ESTIMATE = "timeEstimate";
         public static final String COLUMN_VALUE = "value";
         public static final String COLUMN_STATUS = "status";
+        public static final String COLUMN_RESUMED_AT = "resumedAt";
+        public static final String COLUMN_TIME_ELAPSED = "timeElapsed";
 
-        //NOTE: if adding a column, you must also add the field to Task.java along with getter and setter!
+        //NOTE: if adding a column, you must also add the field to Task.java along with getter and setter
+        // As well as a key in JsonModelHelper!  In the future there is probably a good way to just combine these
         public static final String [] COLUMNS = {COLUMN_TASK_ID, COLUMN_DISPLAY_NAME, COLUMN_CREATED_AT, COLUMN_STARTED_AT,
-            COLUMN_COMPLETED_AT, COLUMN_SCHEDULED_FOR, COLUMN_TIME_ESTIMATE, COLUMN_VALUE, COLUMN_STATUS};
+            COLUMN_COMPLETED_AT, COLUMN_SCHEDULED_FOR, COLUMN_TIME_ESTIMATE, COLUMN_VALUE, COLUMN_STATUS, COLUMN_RESUMED_AT,
+            COLUMN_TIME_ELAPSED};
 
     }
 
@@ -145,6 +150,7 @@ public class DBHelper {
             public void execute(Realm realm) {
                 Task t = realm.createObject(Task.class);
                 DBModelHelper.getTaskFromContentValues(taskVals, t);
+                Log.d(TAG, "execute: Task added with timestamp " + t.getCreatedAt());
                 b.addTask(t);
             }
         });
@@ -153,10 +159,17 @@ public class DBHelper {
     //get methods
 
 
+    //Convenience method
     public Cursor getAllTasks(){
+        return getAllTasks(TasksTable.COLUMN_CREATED_AT, Sort.DESCENDING.name());
+    }
+
+    public Cursor getAllTasks(String orderBy, String sortName){
+        Sort sort = Sort.valueOf(sortName);
         MatrixCursor result = new MatrixCursor(TasksTable.COLUMNS);
-        for(Task t: mRealm.where(Task.class).findAll()){
+        for(Task t: mRealm.where(Task.class).findAllSorted(orderBy, sort)){
             result.addRow(DBModelHelper.getTaskProperties(t));
+            Log.d(TAG, "getAllTasks: " + t.toString());
         }
         return result;
     }

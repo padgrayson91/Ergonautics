@@ -5,6 +5,7 @@
     <dimen name="recycler_item_width">200dp</dimen>
     <dimen name="recycler_item_height">80dp</dimen>
     <dimen name="recycler_item_corner_radius">4dp</dimen>
+    <dimen name="recyler_item_content_width">170dp</dimen>
     <dimen name="floating_action_button_height">78dp</dimen>
     <dimen name="floating_action_button_width">78dp</dimen>
     <dimen name="recycler_item_padding">8dp</dimen>

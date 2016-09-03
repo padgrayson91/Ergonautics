@@ -24,6 +24,7 @@ public class DBModelHelper {
         ContentValues cv = new ContentValues();
         cv.put(DBHelper.TasksTable.COLUMN_DISPLAY_NAME, t.getDisplayName());
         cv.put(DBHelper.TasksTable.COLUMN_TASK_ID, t.getTaskId());
+        Log.d(TAG, "getContentValuesForTask: storing values for " + t.getDisplayName());
 
         for(String key: DBHelper.TasksTable.COLUMNS){
             try {
@@ -134,6 +135,7 @@ public class DBModelHelper {
     }
 
     public static Task getTaskFromContentValues(ContentValues cv, Task toUpdate){
+        Log.d(TAG, "getTaskFromContentValues: setting values for " + toUpdate.getDisplayName());
         for(String key: DBHelper.TasksTable.COLUMNS){
             if(!cv.containsKey(key)){
                 throw new IllegalArgumentException("Contentvalues is missing value for " + key);
@@ -227,6 +229,7 @@ public class DBModelHelper {
     public static Task getTaskFromCursor(Cursor c){
         String displayName = c.getString(c.getColumnIndex(DBHelper.TasksTable.COLUMN_DISPLAY_NAME));
         Task t = new Task(displayName);
+        Log.d(TAG, "getTaskFromCursor: Setting values for " + displayName);
         for(String key: DBHelper.TasksTable.COLUMNS){
             try {
                 Method setter = ReflectionUtils.getSetter(key, Task.class);

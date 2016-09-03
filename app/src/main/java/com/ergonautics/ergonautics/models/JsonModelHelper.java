@@ -30,6 +30,8 @@ public class JsonModelHelper {
     private static final String KEY_TASK_VALUE = "value";
     private static final String KEY_TASK_TIME_ESTIMATE = "time_estimate";
     private static final String KEY_TASK_STATUS = "status";
+    private static final String KEY_TASK_RESUMED_AT = "resumed_at";
+    private static final String KEY_TASK_TIME_ELAPSED = "time_elapsed";
     private static final String KEY_BOARD_NAME = "display_name";
     private static final String KEY_USERNAME_LOGIN = "username";
     private static final String KEY_USERNAME_REGISTER = "username";
@@ -44,7 +46,7 @@ public class JsonModelHelper {
     private static final String KEY_GLOBAL_TASKS = "tasks";
     private static final String KEY_GLOBAL_BOARDS = "boards";
     private static final String [] TASK_KEYS = {KEY_TASK_NAME, KEY_TASK_ID, KEY_TASK_CREATED_AT, KEY_TASK_STARTED_AT,
-        KEY_TASK_SCHEDULED_FOR, KEY_TASK_VALUE, KEY_TASK_TIME_ESTIMATE, KEY_TASK_STATUS};
+        KEY_TASK_SCHEDULED_FOR, KEY_TASK_VALUE, KEY_TASK_TIME_ESTIMATE, KEY_TASK_STATUS, KEY_TASK_RESUMED_AT, KEY_TASK_TIME_ELAPSED};
     private static final String [] BOARD_KEYS = {KEY_BOARD_NAME, KEY_BOARD_ID, KEY_BOARD_TASKS, KEY_BOARD_CREATED_AT, KEY_BOARD_LAST_MODIFIED};
 
     /**
@@ -57,6 +59,7 @@ public class JsonModelHelper {
         for(String key: TASK_KEYS){
             try {
                 Method getter = ReflectionUtils.getGetter(key, Task.class);
+                Log.d(TAG, "getTaskAsJson: got " + getter.invoke(t) + " for field " + key);
                 jobj.put(key, getter.invoke(t));
             } catch (NoSuchMethodException e) {
                 Log.e(TAG, "getTaskAsJson: Unable to get getter method for " + key);
@@ -122,6 +125,7 @@ public class JsonModelHelper {
     public static Task getTaskFromJson(String json) throws JSONException {
         JSONObject jobj = new JSONObject(json);
         Task result = new Task(jobj.getString(KEY_TASK_NAME));
+        Log.d(TAG, "getTaskFromJson: Setting values");
         for(String key: TASK_KEYS) {
             if (jobj.has(key)) {
                 try {

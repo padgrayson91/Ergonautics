@@ -4,7 +4,7 @@ package com.ergonautics.ergonautics.models;
  * Created by patrickgrayson on 8/19/16.
  * Constants shared among all model classes
  */
-interface ModelConstants {
+public interface ModelConstants {
     String REMOTE_ID_DEFAULT = null; //To identify boards which have not been stored in the remote database
     String DISPLAY_NAME_DEFAULT = "";
     long STARTED_AT_DEFAULT = -1L;
@@ -18,4 +18,5 @@ interface ModelConstants {
     int STATUS_IN_PROGRESS = 1;
     int STATUS_COMPLETED = 2;
     int STATUS_DEFUALT = STATUS_UNSTARTED;
+    int STATUS_PAUSED = 3;
 }

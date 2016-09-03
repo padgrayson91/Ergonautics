@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.ergonautics.ergonautics.models.DBModelHelper;
+import com.ergonautics.ergonautics.models.ModelConstants;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
 import com.ergonautics.ergonautics.storage.UriHelper;
@@ -24,7 +25,12 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
     private Context mContext;
     private String mQuery;
 
-    public TaskPresenter(@Nullable String query, @NonNull Context c, IPresenterCallback callback){
+    public TaskPresenter(Context c, IPresenterCallback callback){
+        mQuery = ErgonautContentProvider.TASKS_QUERY_URI.toString();
+        mContext = c;
+    }
+
+    public TaskPresenter(@Nullable String query, @NonNull Context c, @Nullable IPresenterCallback callback){
         super.setCallback(callback);
         mQuery = query;
         mContext = c;
@@ -32,6 +38,7 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
 
     @Override
     @Nullable
+    //TODO: this is being called too many times, need to trace that
     public Cursor present() {
         if(mQuery != null) {
             mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
@@ -59,7 +66,7 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
             mContext.getContentResolver().delete(deleteUri, null, null);
             Log.d(TAG, "onDataRemoved: Removed task with id: " + removed.getTaskId());
             try {
-                super.getCallback().onDataChanged();
+                super.getCallback().notifyDataRemoved(removed);
             } catch (NullPointerException ignored){
                 Log.w(TAG, "onDataRemoved: presenter didn't have a callback");
             }
@@ -76,10 +83,11 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
             Task added = (Task) data[0];
             String boardId = (String) data[1];
             Uri addUri = UriHelper.getTaskInsertUri(boardId);
-            mContext.getContentResolver().insert(addUri, DBModelHelper.getContentValuesForTask(added));
+            Uri result = mContext.getContentResolver().insert(addUri, DBModelHelper.getContentValuesForTask(added));
+            String taskId = result.getLastPathSegment();
             Log.d(TAG, "onDataAdded: Added task with id: " + added.getTaskId());
             try {
-                super.getCallback().onDataChanged();
+                super.getCallback().notifyDataAdded(taskId);
             } catch (NullPointerException ignored){
                 Log.w(TAG, "onDataAdded: presenter didn't have a callback");
             }
@@ -95,7 +103,7 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
         mQuery = query;
         mCursor = mContext.getContentResolver().query(Uri.parse(query), null, null, null, null);
         try {
-            super.getCallback().onDataChanged();
+            super.getCallback().notifyDataUpdated();
         } catch (NullPointerException ignored){}
     }
 
@@ -133,5 +141,72 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
             Task data = DBModelHelper.getTaskFromCursor(mCursor);
             onDataRemoved(data);
         }
+    }
+
+    public void startTask(int position){
+        if(mQuery == null){
+            return;
+        }
+        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        mCursor.moveToPosition(position);
+        Task t = DBModelHelper.getTaskFromCursor(mCursor);
+        t.setStartedAt(System.currentTimeMillis());
+        t.setResumedAt(System.currentTimeMillis());
+        t.setStatus(ModelConstants.STATUS_IN_PROGRESS);
+        mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
+        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        try {
+            super.getCallback().notifyDataUpdated();
+        } catch (NullPointerException ignored){}
+    }
+
+    public void pauseTask(int position){
+        if(mQuery == null){
+            return;
+        }
+        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        mCursor.moveToPosition(position);
+        Task t = DBModelHelper.getTaskFromCursor(mCursor);
+        long timeSinceLastResume = System.currentTimeMillis() - t.getResumedAt();
+        t.setTimeElapsed(t.getTimeElapsed() + timeSinceLastResume);
+        t.setStatus(ModelConstants.STATUS_PAUSED);
+        mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
+        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        try {
+            super.getCallback().notifyDataUpdated();
+        } catch (NullPointerException ignored){}
+    }
+
+    public void resumeTask(int position){
+        if(mQuery == null){
+            return;
+        }
+        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        mCursor.moveToPosition(position);
+        Task t = DBModelHelper.getTaskFromCursor(mCursor);
+        t.setResumedAt(System.currentTimeMillis());
+        t.setStatus(ModelConstants.STATUS_IN_PROGRESS);
+        mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
+        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        try {
+            super.getCallback().notifyDataUpdated();
+        } catch (NullPointerException ignored){}
+    }
+
+    public void finishTask(int position){
+        if(mQuery == null){
+            return;
+        }
+        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        mCursor.moveToPosition(position);
+        Task t = DBModelHelper.getTaskFromCursor(mCursor);
+        long timeSinceLastResume = System.currentTimeMillis() - t.getResumedAt();
+        t.setTimeElapsed(t.getTimeElapsed() + timeSinceLastResume);
+        t.setStatus(ModelConstants.STATUS_COMPLETED);
+        mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
+        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        try {
+            super.getCallback().notifyDataUpdated();
+        } catch (NullPointerException ignored){}
     }
 }

@@ -12,6 +12,7 @@ import com.ergonautics.ergonautics.R;
 import com.ergonautics.ergonautics.app.ITaskListUpdateListener;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
+import com.ergonautics.ergonautics.storage.LocalStorage;
 import com.ergonautics.ergonautics.storage.UriHelper;
 
 /**
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
                 }
                 break;
             case REQUEST_CODE_ADD_TASK:
+                LocalStorage.getInstance(this).setTaskInProgress(null);
                 switchToTaskList(null);
                 break;
             default:

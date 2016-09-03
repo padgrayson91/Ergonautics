@@ -5,6 +5,10 @@
     <string name="hint_edit_password">Password</string>
     <string name="text_button_next">Next</string>
     <string name="text_button_prev">Previous</string>
+    <string name="text_button_start">Start</string>
+    <string name="text_button_pause">Pause</string>
+    <string name="text_button_resume">Resume</string>
+    <string name="text_button_finish">Finish</string>
     <string name="text_button_submit">Submit</string>
     <string name="text_header_name_task">What do you need to do?</string>
     <string name="text_header_time_estimate_task">How long will that take?</string>

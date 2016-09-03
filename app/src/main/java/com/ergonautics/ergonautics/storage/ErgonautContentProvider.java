@@ -147,7 +147,19 @@ public class ErgonautContentProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        // TODO: Implement this to handle requests to update one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        Log.d(TAG, "update: " + uri.toString());
+        DBHelper db = new DBHelper(getContext());
+        int result = 0;
+        switch (sURIMatcher.match(uri)){
+            case TASKS:
+                db.updateTask(values);
+                break;
+            case BOARDS:
+                db.updateTask(values);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid URI " + uri.toString());
+        }
+        return result;
     }
 }

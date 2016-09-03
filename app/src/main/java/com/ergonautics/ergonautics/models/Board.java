@@ -1,7 +1,6 @@
 package com.ergonautics.ergonautics.models;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -21,16 +20,16 @@ public class Board extends RealmObject implements ModelConstants, Serializable {
         this.displayName = displayName;
         tasks = new RealmList<>();
         boardId = REMOTE_ID_DEFAULT;
-        createdAt = new Date().getTime();
-        lastModified = new Date().getTime();
+        createdAt = System.currentTimeMillis();
+        lastModified = System.currentTimeMillis();
     }
 
     public Board(){
         displayName = DISPLAY_NAME_DEFAULT;
         boardId = REMOTE_ID_DEFAULT;
         tasks = new RealmList<>();
-        createdAt = new Date().getTime();
-        lastModified = new Date().getTime();
+        createdAt = System.currentTimeMillis();
+        lastModified = System.currentTimeMillis();
     }
 
     public String getDisplayName(){
