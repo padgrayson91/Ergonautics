@@ -153,4 +153,13 @@ public class Task extends RealmObject implements ModelConstants, Serializable {
     public void setResumedAt(long resumedAt) {
         this.resumedAt = resumedAt;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Task){
+            return ((Task) obj).getTaskId().equals(taskId);
+        } else {
+            return false;
+        }
+    }
 }

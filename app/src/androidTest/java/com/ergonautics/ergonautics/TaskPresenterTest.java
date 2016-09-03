@@ -1,7 +1,6 @@
 package com.ergonautics.ergonautics;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.ergonautics.ergonautics.models.Board;
@@ -49,8 +48,7 @@ public class TaskPresenterTest {
     @Test
     public void testPresent(){
         TaskPresenter presenter = new TaskPresenter(getTargetContext(), null);
-        Cursor c = presenter.present();
-        assertTrue(c.getCount() >= mCreatedTaskIds.size());
+        assertTrue(presenter.getCount() >= mCreatedTaskIds.size());
     }
 
     @Test
@@ -76,9 +74,9 @@ public class TaskPresenterTest {
             @Override
             public void notifyDataRemoved(Object data) {}
         });
-        int previousSize = presenter.present().getCount();
+        int previousSize = presenter.getCount();
         presenter.onDataAdded(toAdd, boardId);
-        int newSize = presenter.present().getCount();
+        int newSize = presenter.getCount();
         assertEquals(previousSize + 1, newSize);
     }
 
@@ -86,9 +84,9 @@ public class TaskPresenterTest {
     public void testDataRemove(){
         TaskPresenter presenter = new TaskPresenter(getTargetContext(), null);
         Task toRemove = (Task) presenter.getData(0);
-        int previousSize = presenter.present().getCount();
+        int previousSize = presenter.getCount();
         presenter.onDataRemoved(toRemove);
-        int newSize = presenter.present().getCount();
+        int newSize = presenter.getCount();
         assertEquals(previousSize - 1, newSize);
         mCreatedTaskIds.remove(toRemove.getTaskId());
     }

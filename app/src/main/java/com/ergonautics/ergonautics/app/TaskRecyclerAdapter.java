@@ -47,13 +47,12 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> im
 
     @Override
     public int getItemCount() {
-        return mPresenter.present().getCount();
+        return mPresenter.getCount();
     }
 
     public void setQuery(String query) {
         mQuery = query;
         mPresenter.newQuery(query);
-        notifyDataSetChanged();
     }
 
     @Override

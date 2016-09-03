@@ -15,9 +15,13 @@ import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
 import com.ergonautics.ergonautics.storage.UriHelper;
 import com.ergonautics.ergonautics.view.SwipeableRecyclerViewTouchListener;
 
+import java.util.ArrayList;
+
 /**
  * Created by patrickgrayson on 9/2/16.
+ * Presenter used to expose Task objects to view components
  */
+@SuppressWarnings("ConstantConditions")
 public class TaskPresenter extends BasePresenter implements SwipeableRecyclerViewTouchListener.SwipeListener {
     private static final String TAG = "ERGONAUT-PRESENT";
 
@@ -25,37 +29,54 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
     private Context mContext;
     private String mQuery;
 
+    private ArrayList<Object> mTasks;
+
+    /**
+     * Constructor which uses a default query to return the full list of tasks
+     * @param c Context where this presenter is being used
+     * @param callback Callback to receive information about data that is changed
+     */
     public TaskPresenter(Context c, IPresenterCallback callback){
+        super.setCallback(callback);
         mQuery = ErgonautContentProvider.TASKS_QUERY_URI.toString();
         mContext = c;
+        newQuery(mQuery);
     }
 
+    /**
+     * Constructor which takes a query to return specific tasks
+     * @param query the desired query.  Can be null if no tasks are desired (e.g. when only adding tasks)
+     * @param c Context where this presenter is being used
+     * @param callback Callback to receive information about data that is changed
+     */
     public TaskPresenter(@Nullable String query, @NonNull Context c, @Nullable IPresenterCallback callback){
         super.setCallback(callback);
         mQuery = query;
         mContext = c;
+        if(mQuery != null) {
+            newQuery(mQuery);
+        }
+    }
+
+    @Override
+    public int getCount() {
+        if(mTasks == null){
+            return 0;
+        } else {
+            return mTasks.size();
+        }
     }
 
     @Override
     @Nullable
-    //TODO: this is being called too many times, need to trace that
-    public Cursor present() {
-        if(mQuery != null) {
-            mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
-            Log.d(TAG, String.format("present: Presenting %d tasks", mCursor.getCount()));
-        }
-        return mCursor;
+    public ArrayList<Object> present() {
+        getArrayListFromCursor();
+        return mTasks;
     }
 
     @Override
     public Object getData(int position) {
-        if(mQuery != null) {
-            mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
-            mCursor.moveToPosition(position);
-            Task data = DBModelHelper.getTaskFromCursor(mCursor);
-            return data;
-        }
-        return null;
+        return mTasks.get(position);
     }
 
     @Override
@@ -70,10 +91,18 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
             } catch (NullPointerException ignored){
                 Log.w(TAG, "onDataRemoved: presenter didn't have a callback");
             }
+            refresh();
         } catch (ClassCastException ex) {
             throw new ClassCastException("TaskPresenter must only be used with Task objects! Got: " + data.getClass());
         } catch (IndexOutOfBoundsException ex){
             Log.w(TAG, "onDataRemoved: no data provided");
+        }
+    }
+
+    @Override
+    public void refresh() {
+        if(mQuery != null) {
+            newQuery(mQuery);
         }
     }
 
@@ -91,6 +120,7 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
             } catch (NullPointerException ignored){
                 Log.w(TAG, "onDataAdded: presenter didn't have a callback");
             }
+            refresh();
         } catch (ClassCastException ex) {
             throw new ClassCastException("Adding task requires a Task object and a String! Got: " + data.getClass());
         } catch (IndexOutOfBoundsException ex){
@@ -100,8 +130,10 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
 
     @Override
     public void newQuery(String query) {
+        Log.d(TAG, "newQuery: Getting data from contentresolver");
         mQuery = query;
         mCursor = mContext.getContentResolver().query(Uri.parse(query), null, null, null, null);
+        getArrayListFromCursor();
         try {
             super.getCallback().notifyDataUpdated();
         } catch (NullPointerException ignored){}
@@ -144,69 +176,62 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
     }
 
     public void startTask(int position){
-        if(mQuery == null){
-            return;
-        }
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
-        mCursor.moveToPosition(position);
-        Task t = DBModelHelper.getTaskFromCursor(mCursor);
+        Task t = (Task) mTasks.get(position);
         t.setStartedAt(System.currentTimeMillis());
         t.setResumedAt(System.currentTimeMillis());
         t.setStatus(ModelConstants.STATUS_IN_PROGRESS);
         mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        refresh();
         try {
             super.getCallback().notifyDataUpdated();
         } catch (NullPointerException ignored){}
     }
 
     public void pauseTask(int position){
-        if(mQuery == null){
-            return;
-        }
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
-        mCursor.moveToPosition(position);
-        Task t = DBModelHelper.getTaskFromCursor(mCursor);
+        Task t = (Task) mTasks.get(position);
         long timeSinceLastResume = System.currentTimeMillis() - t.getResumedAt();
         t.setTimeElapsed(t.getTimeElapsed() + timeSinceLastResume);
         t.setStatus(ModelConstants.STATUS_PAUSED);
         mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        refresh();
         try {
             super.getCallback().notifyDataUpdated();
         } catch (NullPointerException ignored){}
     }
 
     public void resumeTask(int position){
-        if(mQuery == null){
-            return;
-        }
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
-        mCursor.moveToPosition(position);
-        Task t = DBModelHelper.getTaskFromCursor(mCursor);
+        Task t = (Task) mTasks.get(position);
         t.setResumedAt(System.currentTimeMillis());
         t.setStatus(ModelConstants.STATUS_IN_PROGRESS);
         mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        refresh();
         try {
             super.getCallback().notifyDataUpdated();
         } catch (NullPointerException ignored){}
     }
 
     public void finishTask(int position){
-        if(mQuery == null){
-            return;
-        }
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
-        mCursor.moveToPosition(position);
-        Task t = DBModelHelper.getTaskFromCursor(mCursor);
+        Task t = (Task) mTasks.get(position);
         long timeSinceLastResume = System.currentTimeMillis() - t.getResumedAt();
         t.setTimeElapsed(t.getTimeElapsed() + timeSinceLastResume);
         t.setStatus(ModelConstants.STATUS_COMPLETED);
         mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
+        refresh();
         try {
             super.getCallback().notifyDataUpdated();
         } catch (NullPointerException ignored){}
+    }
+
+    private void getArrayListFromCursor(){
+        mTasks = new ArrayList<>();
+        if(mCursor == null){
+            return;
+        } else {
+            mCursor.moveToFirst();
+            while(!mCursor.isAfterLast()){
+                mTasks.add(DBModelHelper.getTaskFromCursor(mCursor));
+                mCursor.moveToNext();
+            }
+        }
     }
 }

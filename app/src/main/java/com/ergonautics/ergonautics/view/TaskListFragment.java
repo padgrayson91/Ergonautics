@@ -26,6 +26,7 @@ public class TaskListFragment extends Fragment{
     private FloatingActionButton mAddTaskButton;
     private ITaskListUpdateListener mTaskAddSelectedListener;
     private TaskRecyclerAdapter mAdapter;
+    private String mQuery;
 
     public static TaskListFragment getInstance(String query){
         TaskListFragment fragment = new TaskListFragment();
@@ -57,8 +58,8 @@ public class TaskListFragment extends Fragment{
         //Get the query String
         Bundle args = getArguments();
         if (args != null) {
-            String query = args.getString(ARGS_KEY_QUERY);
-            mAdapter = new TaskRecyclerAdapter(query, getContext());
+            mQuery = args.getString(ARGS_KEY_QUERY);
+            mAdapter = new TaskRecyclerAdapter(mQuery, getContext());
         } else {
             throw new IllegalStateException("Cannot initialize TaskListFragment with no arguments! Did you forget to use getInstance?");
         }
@@ -71,6 +72,7 @@ public class TaskListFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
+        mAdapter.setQuery(mQuery);
         mAdapter.notifyDataSetChanged();
     }
 
