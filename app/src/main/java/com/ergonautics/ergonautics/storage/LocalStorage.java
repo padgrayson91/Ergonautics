@@ -51,6 +51,7 @@ public class LocalStorage {
      *
      * @return a Task object that was most recently being constructed
      */
+    //TODO: task in progress should be accessed via singleton in case the user closes the app
     public Task getTaskInProgress() {
         Task inProgress = new Task("");
         String taskJSON = mPrefs.getString(PROPERTY_TASK_IN_PROGRESS, null);
@@ -80,6 +81,7 @@ public class LocalStorage {
      *
      * @param inProgress the task to store
      */
+    //TODO: task in progress should be accessed via singleton in case the user closes the app
     public void setTaskInProgress(Task inProgress){
         SharedPreferences.Editor editor = mPrefs.edit();
         if(inProgress == null){

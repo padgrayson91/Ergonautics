@@ -18,12 +18,12 @@ import io.realm.RealmList;
 /**
  * Created by patrickgrayson on 9/6/16.
  */
-public class BoardPresenter extends BasePresenter{
+public class BoardPresenter extends BasePresenter<Board>{
     private static final String TAG = "ERGONAUT-PRESENT";
 
     private Cursor mCursor;
     private String mQuery;
-    private ArrayList<Object> mBoards;
+    private ArrayList<Board> mBoards;
     private Context mContext;
 
     public BoardPresenter(Context c, IPresenterCallback callback){
@@ -34,13 +34,13 @@ public class BoardPresenter extends BasePresenter{
     }
 
     @Override
-    public ArrayList<Object> present() {
+    public ArrayList<Board> present() {
         getArrayListFromCursor();
         return mBoards;
     }
 
     @Override
-    public Object getData(int position) {
+    public Board getData(int position) {
         if(mBoards == null){
             return null;
         } else {
@@ -49,9 +49,9 @@ public class BoardPresenter extends BasePresenter{
     }
 
     @Override
-    public void removeData(Object... data) {
+    public void removeData(Board... data) {
         try {
-            Board toRemove = (Board) data[0];
+            Board toRemove =  data[0];
             String id = toRemove.getBoardId();
             mContext.getContentResolver().delete(Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, id), null, null);
             try {
@@ -60,8 +60,6 @@ public class BoardPresenter extends BasePresenter{
                 Log.w(TAG, "removeData: presenter didn't have a callback");
             }
             refresh();
-        } catch (ClassCastException ex) {
-            throw new IllegalArgumentException("Expected argument of type Board but got " + data[0].getClass());
         } catch (IndexOutOfBoundsException ex){
             throw new IllegalArgumentException("method removeData requires at least one object of type Board to remove");
         }
@@ -88,7 +86,7 @@ public class BoardPresenter extends BasePresenter{
     }
 
     @Override
-    public void updateData(Object... data) {
+    public void updateData(Board... data) {
         //TODO: use contentresolver to update board and notify callback
     }
 

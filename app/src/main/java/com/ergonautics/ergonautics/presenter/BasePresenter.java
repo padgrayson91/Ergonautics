@@ -7,14 +7,14 @@ import java.util.ArrayList;
 /**
  * Created by patrickgrayson on 9/2/16.
  */
-public abstract class BasePresenter {
+public abstract class BasePresenter<T> {
     private IPresenterCallback mCallback;
 
-    public abstract ArrayList<Object> present();
-    public abstract Object getData(int position);
-    public abstract void removeData(Object... data);
+    public abstract ArrayList<T> present();
+    public abstract T getData(int position);
+    public abstract void removeData(T... data);
     public abstract void addData(Object... data);
-    public abstract void updateData(Object... data);
+    public abstract void updateData(T... data);
     public abstract void newQuery(String query);
     public abstract void refresh();
     public abstract int getCount();

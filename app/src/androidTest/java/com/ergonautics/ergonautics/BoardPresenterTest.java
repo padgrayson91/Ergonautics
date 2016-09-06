@@ -94,7 +94,7 @@ public class BoardPresenterTest {
     @Test
     public void getTaskFromRetrievedBoard(){
         BoardPresenter presenter = new BoardPresenter(getTargetContext(), null);
-        ArrayList<Object> boards = presenter.present();
+        ArrayList<Board> boards = presenter.present();
         Task foundTask = null;
         for(Object o: boards){
             Board b = (Board) o;

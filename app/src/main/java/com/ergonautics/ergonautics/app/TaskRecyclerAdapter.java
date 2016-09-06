@@ -16,7 +16,7 @@ import com.ergonautics.ergonautics.view.TaskViewHolder;
 /**
  * Created by patrickgrayson on 8/24/16.
  */
-public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> implements IPresenterCallback, TaskViewHolder.IViewHolderClickCallback {
+public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> implements IPresenterCallback, TaskViewHolder.ITaskViewHolderClickCallback {
     private static final String TAG = "ERGONAUT-ADAPT";
     private static TaskPresenter mPresenter;
     private String mQuery;

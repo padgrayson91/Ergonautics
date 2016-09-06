@@ -3,17 +3,19 @@ package com.ergonautics.ergonautics.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.ergonautics.ergonautics.ErgonautAPI;
 import com.ergonautics.ergonautics.R;
 import com.ergonautics.ergonautics.app.ITaskListUpdateListener;
+import com.ergonautics.ergonautics.app.MainPageAdapter;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
 import com.ergonautics.ergonautics.storage.LocalStorage;
-import com.ergonautics.ergonautics.storage.UriHelper;
+
+import java.util.ArrayList;
 
 /**
  * App main page where user can view active tasks, current boards, notifications, etc.
@@ -28,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
     private static final int REQUEST_CODE_LOGIN = 1001;
     private static final int REQUEST_CODE_ADD_TASK = 1002;
 
+    private TabOnlyViewPager mPager;
+    private MainPageAdapter mPageAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
 
         //Check if user is logged in
         ErgonautAPI api = new ErgonautAPI(this);
+        mPager = (TabOnlyViewPager) findViewById(R.id.pager_main);
+        mPageAdapter = new MainPageAdapter(getSupportFragmentManager(), getFragmentsForPageAdapter());
+        mPager.setAdapter(mPageAdapter);
         if(!api.isLoggedIn()){
             //If the user is not logged in, go to the login activity
             switchToLoginActivity();
@@ -67,34 +75,33 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
 
     private void switchToLandingPage(){
         //TODO: switch to different pages based on user preferences
-        switchToTaskList(null);
+        switchToBoardList();
     }
 
     //Show a task list for a specific board or (if forBoard is null) show all tasks in the db
     private void switchToTaskList(@Nullable String forBoard){
-        String queryString = "";
-        if(forBoard == null){
-            queryString = ErgonautContentProvider.TASKS_QUERY_URI.toString();
-        } else {
-            queryString = UriHelper.getTaskForBoardQueryUri(forBoard).toString();
-        }
-        //First check if the task list was already on screen
-        TaskListFragment tlf = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_TASK_LIST);
-        if(tlf != null){
-            Log.d(TAG, "switchToTaskList: Updating task list");
-            //tlf.updateTaskList();
-        } else {
-            Log.d(TAG, "switchToTaskList: Creating new task list fragment");
-            TaskListFragment taskListFragment = TaskListFragment.getInstance(queryString);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.content, taskListFragment, FRAGMENT_TAG_TASK_LIST);
-            ft.commit();
-        }
+        String queryString;
+        mPager.setCurrentItem(1);
+    }
+
+    private void switchToBoardList(){
+        mPager.setCurrentItem(0);
     }
 
     private void switchToLoginActivity(){
         Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
         startActivityForResult(loginIntent, REQUEST_CODE_LOGIN);
+    }
+
+    private ArrayList<Fragment> getFragmentsForPageAdapter(){
+        ArrayList<Fragment> fragments = new ArrayList<>();
+        //TODO: get all fragments that should be used for the main page
+        BoardListFragment boardListFragment = BoardListFragment.newInstance();
+        fragments.add(boardListFragment);
+        String queryString = ErgonautContentProvider.TASKS_QUERY_URI.toString();
+        TaskListFragment taskListFragment = TaskListFragment.newInstance(queryString);
+        fragments.add(taskListFragment);
+        return fragments;
     }
 
     @Override

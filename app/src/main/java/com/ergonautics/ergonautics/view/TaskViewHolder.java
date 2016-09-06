@@ -22,8 +22,8 @@ public class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     private TextView mElapsedTimeText;
     private Context mContext;
     private Task mTask;
-    private IViewHolderClickCallback mCallback;
-    public TaskViewHolder(View itemView, Context c, IViewHolderClickCallback callback) {
+    private ITaskViewHolderClickCallback mCallback;
+    public TaskViewHolder(View itemView, Context c, ITaskViewHolderClickCallback callback) {
         super(itemView);
         mContext = c;
         mCallback = callback;
@@ -101,7 +101,7 @@ public class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         }
     }
 
-    public interface IViewHolderClickCallback {
+    public interface ITaskViewHolderClickCallback {
         void onClickStart(int position);
         void onClickPause(int position);
         void onClickResume(int position);

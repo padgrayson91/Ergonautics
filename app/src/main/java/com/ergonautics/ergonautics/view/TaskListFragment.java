@@ -28,7 +28,7 @@ public class TaskListFragment extends Fragment{
     private TaskRecyclerAdapter mAdapter;
     private String mQuery;
 
-    public static TaskListFragment getInstance(String query){
+    public static TaskListFragment newInstance(String query){
         TaskListFragment fragment = new TaskListFragment();
         Bundle args = new Bundle();
         args.putString(ARGS_KEY_QUERY, query);
@@ -61,7 +61,7 @@ public class TaskListFragment extends Fragment{
             mQuery = args.getString(ARGS_KEY_QUERY);
             mAdapter = new TaskRecyclerAdapter(mQuery, getContext());
         } else {
-            throw new IllegalStateException("Cannot initialize TaskListFragment with no arguments! Did you forget to use getInstance?");
+            throw new IllegalStateException("Cannot initialize TaskListFragment with no arguments! Did you forget to use newInstance?");
         }
         mTasksRecycler.setAdapter(mAdapter);
         mTasksRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
