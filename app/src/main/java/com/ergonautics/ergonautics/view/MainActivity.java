@@ -3,6 +3,7 @@ package com.ergonautics.ergonautics.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
 
     private TabOnlyViewPager mPager;
     private MainPageAdapter mPageAdapter;
+    private TabLayout mTabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements ITaskListUpdateLi
         mPager = (TabOnlyViewPager) findViewById(R.id.pager_main);
         mPageAdapter = new MainPageAdapter(getSupportFragmentManager(), getFragmentsForPageAdapter());
         mPager.setAdapter(mPageAdapter);
+        mTabs = (TabLayout) findViewById(R.id.tabs_main);
+        mTabs.setupWithViewPager(mPager);
         if(!api.isLoggedIn()){
             //If the user is not logged in, go to the login activity
             switchToLoginActivity();

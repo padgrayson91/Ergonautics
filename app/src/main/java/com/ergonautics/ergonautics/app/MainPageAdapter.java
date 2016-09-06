@@ -11,6 +11,7 @@ import java.util.ArrayList;
  */
 public class MainPageAdapter extends FragmentPagerAdapter {
     private ArrayList<Fragment> mFragments;
+    private static final String[] PAGE_TITLES = {"Boards", "Tasks"};
 
     public MainPageAdapter(FragmentManager fm, ArrayList<Fragment> fragments) {
         super(fm);
@@ -29,5 +30,10 @@ public class MainPageAdapter extends FragmentPagerAdapter {
 
     public void updateFragment(int index, Fragment f){
         mFragments.set(index, f);
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return PAGE_TITLES[position];
     }
 }
