@@ -155,7 +155,7 @@ public class ErgonautContentProvider extends ContentProvider {
                 db.updateTask(values);
                 break;
             case BOARDS:
-                db.updateTask(values);
+                db.updateBoard(values);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid URI " + uri.toString());

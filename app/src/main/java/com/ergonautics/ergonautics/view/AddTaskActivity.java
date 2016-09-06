@@ -37,7 +37,7 @@ public class AddTaskActivity extends AppCompatActivity implements ITaskListUpdat
         allBoards.moveToFirst();
         Board temp = DBModelHelper.getBoardFromCursor(allBoards);
         allBoards.close();
-        mPresenter.onDataAdded(t, temp.getBoardId());
+        mPresenter.addData(t, temp.getBoardId());
         Log.d(TAG, "onTaskSubmitted: Added task : " + t.getDisplayName());
         setResult(RESULT_OK);
         finish();

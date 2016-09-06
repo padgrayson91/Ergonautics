@@ -6,8 +6,8 @@ import android.support.test.runner.AndroidJUnit4;
 import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.DBModelHelper;
 import com.ergonautics.ergonautics.models.Task;
+import com.ergonautics.ergonautics.presenter.BoardPresenter;
 import com.ergonautics.ergonautics.presenter.IPresenterCallback;
-import com.ergonautics.ergonautics.presenter.TaskPresenter;
 import com.ergonautics.ergonautics.storage.DBHelper;
 
 import org.junit.After;
@@ -19,13 +19,14 @@ import java.util.ArrayList;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 /**
- * Created by patrickgrayson on 9/3/16.
+ * Created by patrickgrayson on 9/6/16.
  */
 @RunWith(AndroidJUnit4.class)
-public class TaskPresenterTest {
+public class BoardPresenterTest {
     private ArrayList<String> mCreatedTaskIds;
     private ArrayList<String> mCreatedBoardIds;
 
@@ -47,25 +48,24 @@ public class TaskPresenterTest {
 
     @Test
     public void testPresent(){
-        TaskPresenter presenter = new TaskPresenter(getTargetContext(), null);
-        assertTrue(presenter.getCount() >= mCreatedTaskIds.size());
+        BoardPresenter presenter = new BoardPresenter(getTargetContext(), null);
+        assertTrue(presenter.getCount() >= mCreatedBoardIds.size());
     }
 
     @Test
     public void testGetData(){
-        TaskPresenter presenter = new TaskPresenter(getTargetContext(), null);
-        Task t = (Task) presenter.getData(0);
-        assertTrue(mCreatedTaskIds.contains(t.getTaskId()));
+        BoardPresenter presenter = new BoardPresenter(getTargetContext(), null);
+        Board b = (Board) presenter.getData(0);
+        assertTrue(mCreatedBoardIds.contains(b.getBoardId()));
     }
 
     @Test
     public void testDataAdded(){
-        Task toAdd = new Task("Another task");
-        String boardId = mCreatedBoardIds.get(0);
-        TaskPresenter presenter = new TaskPresenter(getTargetContext(), new IPresenterCallback() {
+        Board toAdd = new Board("Another Board");
+        BoardPresenter presenter = new BoardPresenter(getTargetContext(), new IPresenterCallback() {
             @Override
             public void notifyDataAdded(String id) {
-                mCreatedTaskIds.add(id);
+                mCreatedBoardIds.add(id);
             }
 
             @Override
@@ -75,20 +75,38 @@ public class TaskPresenterTest {
             public void notifyDataRemoved(Object data) {}
         });
         int previousSize = presenter.getCount();
-        presenter.addData(toAdd, boardId);
+        presenter.addData(toAdd);
         int newSize = presenter.getCount();
         assertEquals(previousSize + 1, newSize);
     }
 
     @Test
     public void testDataRemove(){
-        TaskPresenter presenter = new TaskPresenter(getTargetContext(), null);
-        Task toRemove = (Task) presenter.getData(0);
+        BoardPresenter presenter = new BoardPresenter(getTargetContext(), null);
+        Board toRemove = (Board) presenter.getData(0);
         int previousSize = presenter.getCount();
         presenter.removeData(toRemove);
         int newSize = presenter.getCount();
         assertEquals(previousSize - 1, newSize);
-        mCreatedTaskIds.remove(toRemove.getTaskId());
+        mCreatedBoardIds.remove(toRemove.getBoardId());
+    }
+
+    @Test
+    public void getTaskFromRetrievedBoard(){
+        BoardPresenter presenter = new BoardPresenter(getTargetContext(), null);
+        ArrayList<Object> boards = presenter.present();
+        Task foundTask = null;
+        for(Object o: boards){
+            Board b = (Board) o;
+            try {
+                if(b.getTasks().get(0) != null) {
+                    foundTask = b.getTasks().get(0);
+                }
+            } catch (IndexOutOfBoundsException ignored) {
+
+            }
+        }
+        assertNotNull(foundTask);
     }
 
     @After
@@ -103,6 +121,4 @@ public class TaskPresenterTest {
 
 
     }
-
-
 }

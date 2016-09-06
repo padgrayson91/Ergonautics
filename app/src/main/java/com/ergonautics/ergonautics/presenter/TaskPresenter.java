@@ -80,22 +80,22 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
     }
 
     @Override
-    public void onDataRemoved(Object... data) {
+    public void removeData(Object... data) {
         try {
             Task removed = (Task) data[0];
             Uri deleteUri = Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, removed.getTaskId());
             mContext.getContentResolver().delete(deleteUri, null, null);
-            Log.d(TAG, "onDataRemoved: Removed task with id: " + removed.getTaskId());
+            Log.d(TAG, "removeData: Removed task with id: " + removed.getTaskId());
             try {
                 super.getCallback().notifyDataRemoved(removed);
             } catch (NullPointerException ignored){
-                Log.w(TAG, "onDataRemoved: presenter didn't have a callback");
+                Log.w(TAG, "removeData: presenter didn't have a callback");
             }
             refresh();
         } catch (ClassCastException ex) {
             throw new ClassCastException("TaskPresenter must only be used with Task objects! Got: " + data.getClass());
         } catch (IndexOutOfBoundsException ex){
-            Log.w(TAG, "onDataRemoved: no data provided");
+            Log.w(TAG, "removeData: no data provided");
         }
     }
 
@@ -107,25 +107,30 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
     }
 
     @Override
-    public void onDataAdded(Object... data) {
+    public void addData(Object... data) {
         try {
             Task added = (Task) data[0];
             String boardId = (String) data[1];
             Uri addUri = UriHelper.getTaskInsertUri(boardId);
             Uri result = mContext.getContentResolver().insert(addUri, DBModelHelper.getContentValuesForTask(added));
             String taskId = result.getLastPathSegment();
-            Log.d(TAG, "onDataAdded: Added task with id: " + added.getTaskId());
+            Log.d(TAG, "addData: Added task with id: " + added.getTaskId());
             try {
                 super.getCallback().notifyDataAdded(taskId);
             } catch (NullPointerException ignored){
-                Log.w(TAG, "onDataAdded: presenter didn't have a callback");
+                Log.w(TAG, "addData: presenter didn't have a callback");
             }
             refresh();
         } catch (ClassCastException ex) {
             throw new ClassCastException("Adding task requires a Task object and a String! Got: " + data.getClass());
         } catch (IndexOutOfBoundsException ex){
-            Log.w(TAG, "onDataAdded: insufficient data provided, did you forget a board id?");
+            Log.w(TAG, "addData: insufficient data provided, did you forget a board id?");
         }
+    }
+
+    @Override
+    public void updateData(Object... data) {
+        //TODO
     }
 
     @Override
@@ -158,7 +163,7 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
         for(int position : reverseSortedPositions){
             mCursor.moveToPosition(position);
             Task data = DBModelHelper.getTaskFromCursor(mCursor);
-            onDataRemoved(data);
+            removeData(data);
         }
     }
 
@@ -171,7 +176,7 @@ public class TaskPresenter extends BasePresenter implements SwipeableRecyclerVie
         for(int position : reverseSortedPositions){
             mCursor.moveToPosition(position);
             Task data = DBModelHelper.getTaskFromCursor(mCursor);
-            onDataRemoved(data);
+            removeData(data);
         }
     }
 

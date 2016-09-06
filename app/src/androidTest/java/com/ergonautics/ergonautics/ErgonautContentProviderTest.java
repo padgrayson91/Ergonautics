@@ -254,6 +254,16 @@ public class ErgonautContentProviderTest {
         mCreatedBoards.remove(boardId);
     }
 
+    @Test
+    public void testUpdateBoard(){
+        //TODO
+    }
+
+    @Test
+    public void testUpdateTask(){
+        //TODO
+    }
+
     @After
     public void tearDown(){
         for(String s: mCreatedTasks){

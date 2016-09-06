@@ -12,8 +12,9 @@ public abstract class BasePresenter {
 
     public abstract ArrayList<Object> present();
     public abstract Object getData(int position);
-    public abstract void onDataRemoved(Object... data);
-    public abstract void onDataAdded(Object... data);
+    public abstract void removeData(Object... data);
+    public abstract void addData(Object... data);
+    public abstract void updateData(Object... data);
     public abstract void newQuery(String query);
     public abstract void refresh();
     public abstract int getCount();
