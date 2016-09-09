@@ -1,8 +1,10 @@
 package com.ergonautics.ergonautics.view;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.ergonautics.ergonautics.R;
+import com.ergonautics.ergonautics.app.ICreationFragmentCallback;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,10 +24,21 @@ public class TaskTimeEstimateFragment extends Fragment {
     private RadioGroup mTimeOptionsRadioGroup;
     private long [] mTimeOptions;
     private String [] mTimesDisplayed;
+    private ICreationFragmentCallback mCallback;
 
 
     public TaskTimeEstimateFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (ICreationFragmentCallback) getParentFragment();
+        } catch (ClassCastException ex) {
+            Log.w(TAG, "onAttach: fragment created without callback");
+        }
     }
 
     public static TaskTimeEstimateFragment newInstance(){

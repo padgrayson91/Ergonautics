@@ -42,7 +42,7 @@ public class BoardListFragment extends Fragment {
         // Inflate the layout for this fragment
         View root =  inflater.inflate(R.layout.fragment_board_list, container, false);
         mRecycler = (RecyclerView) root.findViewById(R.id.recycler_board);
-        mAdapter = new BoardRecyclerAdapter(getContext());
+        mAdapter = new BoardRecyclerAdapter(getContext(), R.layout.recycler_item_board);
         try {
             mAdapter.addBoardSelectedListener((BoardRecyclerAdapter.BoardSelectedListener) getActivity());
         } catch (ClassCastException ex){

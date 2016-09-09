@@ -19,6 +19,7 @@
         </activity>
         <activity android:name=".view.LoginActivity" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".view.AddTaskActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity

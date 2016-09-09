@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.ergonautics.ergonautics.R;
+import com.ergonautics.ergonautics.app.ICreationFragmentCallback;
 import com.ergonautics.ergonautics.app.ITaskListUpdateListener;
 import com.ergonautics.ergonautics.app.NewTaskPageAdapter;
 import com.ergonautics.ergonautics.models.Task;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
  * Created by patrickgrayson on 8/30/16.
  * Dialog for allowing users to create a new task
  */
-public class AddTaskFragment extends Fragment {
+public class AddTaskFragment extends Fragment implements ICreationFragmentCallback {
     private static final String TAG = "ERGONAUT-TASKDLG";
 
     private ViewPager mTaskCreationPager; //View pager containing fragments for each step in the task creation process
@@ -146,7 +147,6 @@ public class AddTaskFragment extends Fragment {
             switch (view.getId()) {
                 case R.id.button_next:
                     int item = mTaskCreationPager.getCurrentItem();
-                    updateTaskData(item);
                     if(item == mNewTaskAdapter.getCount() - 1){
                         handleSubmit();
                     } else {
@@ -161,10 +161,27 @@ public class AddTaskFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onDataSubmitted() {
+        int position = mTaskCreationPager.getCurrentItem();
+        Log.d(TAG, "onDataSubmitted: Got data for " + position);
+        if(position < (mNewTaskAdapter.getCount() - 1)) {
+            mTaskCreationPager.setCurrentItem(position + 1);
+        } else {
+            updateTaskData(position);
+            handleSubmit();
+        }
+    }
+
     private class OnCreationPageChangeListener extends ViewPager.SimpleOnPageChangeListener {
+        private int previousPage;
+
         @Override
         public void onPageSelected(int position) {
+            Log.d(TAG, "onPageSelected: Moving to " + position);
+            //TODO: submit data from the previous page
             super.onPageSelected(position);
+            updateTaskData(previousPage);
             if(position == 0){
                 mPrevButton.setEnabled(false);
                 mNextButton.setText(getResources().getString(R.string.text_button_next));
@@ -178,6 +195,7 @@ public class AddTaskFragment extends Fragment {
             }
             updateHeaderText(position);
             restoreData(position);
+            previousPage = position;
         }
     }
 }

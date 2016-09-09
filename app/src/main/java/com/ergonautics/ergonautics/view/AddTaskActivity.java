@@ -3,7 +3,6 @@ package com.ergonautics.ergonautics.view;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.ergonautics.ergonautics.R;
 import com.ergonautics.ergonautics.app.ITaskListUpdateListener;
@@ -31,7 +30,6 @@ public class AddTaskActivity extends AppCompatActivity implements ITaskListUpdat
     @Override
     public void onTaskSubmitted(Task t) {
         Board current = LocalStorage.getInstance(this).getSelectedBoard();
-        Log.d(TAG, "onTaskSubmitted: Adding task to " + current.getDisplayName());
         if(current == null) {
             //TODO: explicit DB Access here is a No No in general, should force board selection
             Cursor allBoards = new DBHelper(AddTaskActivity.this).getAllBoards();

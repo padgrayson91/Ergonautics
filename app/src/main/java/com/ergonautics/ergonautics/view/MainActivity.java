@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements BoardRecyclerAdap
         mTabs.setupWithViewPager(mPager);
         mDrawerRecycler = (RecyclerView) findViewById(R.id.recycler_main_drawer);
         mDrawerRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mDrawerAdapter = new BoardRecyclerAdapter(this);
+        mDrawerAdapter = new BoardRecyclerAdapter(this, R.layout.drawer_item_board);
         mDrawerAdapter.addBoardSelectedListener(this);
         mDrawerRecycler.setAdapter(mDrawerAdapter);
         mRecyclerAddButton = (Button) findViewById(R.id.button_create_new_board);
@@ -112,7 +112,9 @@ public class MainActivity extends AppCompatActivity implements BoardRecyclerAdap
                 LocalStorage storage = LocalStorage.getInstance(this);
                 storage.setTaskInProgress(null);
                 mDrawerAdapter.refresh();
-                switchToTaskList(storage.getSelectedBoard().getBoardId());
+                if(storage.getSelectedBoard() != null) {
+                    switchToTaskList(storage.getSelectedBoard().getBoardId());
+                }
                 break;
             case REQUEST_CODE_ADD_BOARD:
                 mDrawerAdapter.refresh();

@@ -1,12 +1,12 @@
 package com.ergonautics.ergonautics.app;
 
 import android.content.Context;
+import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ergonautics.ergonautics.R;
 import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.presenter.BoardPresenter;
 import com.ergonautics.ergonautics.presenter.IPresenterCallback;
@@ -22,11 +22,13 @@ public class BoardRecyclerAdapter extends RecyclerView.Adapter<BoardViewHolder> 
     private static BoardPresenter mPresenter;
     private ArrayList<Integer> mSelectedBoards;
     private BoardSelectedListener mListener;
+    private int mLayoutResId;
 
-    public BoardRecyclerAdapter(Context c){
+    public BoardRecyclerAdapter(Context c, @LayoutRes  int layoutRes){
         if(mPresenter == null) {
             mPresenter = new BoardPresenter(c, this);
         }
+        mLayoutResId = layoutRes;
     }
 
     public void addBoardSelectedListener(BoardSelectedListener listener){
@@ -38,7 +40,7 @@ public class BoardRecyclerAdapter extends RecyclerView.Adapter<BoardViewHolder> 
         Context context = parent.getContext();
         mSelectedBoards = new ArrayList<>();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View boardView = inflater.inflate(R.layout.recycler_item_board, parent, false);
+        View boardView = inflater.inflate(mLayoutResId, parent, false);
         BoardViewHolder viewHolder = new BoardViewHolder(boardView, context, this);
         return viewHolder;
     }
