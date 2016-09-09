@@ -7,9 +7,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -45,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements BoardRecyclerAdap
     private RecyclerView mDrawerRecycler;
     private BoardRecyclerAdapter mDrawerAdapter;
     private DrawerLayout mDrawer;
+    private Toolbar mToolbar;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,11 @@ public class MainActivity extends AppCompatActivity implements BoardRecyclerAdap
                 createNew(view);
             }
         });
+        setupToolbar();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        mDrawer.addDrawerListener(mDrawerToggle);
+        setupDrawerToggle();
         if(!api.isLoggedIn()){
             //If the user is not logged in, go to the login activity
             switchToLoginActivity();
@@ -170,5 +179,17 @@ public class MainActivity extends AppCompatActivity implements BoardRecyclerAdap
         LocalStorage.getInstance(this).setSelectedBoard(b);
         mDrawer.closeDrawer(Gravity.LEFT);
         //TODO set the page title to the selected board
+    }
+
+    void setupToolbar(){
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    void setupDrawerToggle(){
+        mDrawerToggle = new android.support.v7.app.ActionBarDrawerToggle(this,mDrawer,mToolbar,R.string.app_name, R.string.app_name);
+        //This is necessary to change the icon of the Drawer Toggle upon state change.
+        mDrawerToggle.syncState();
     }
 }
