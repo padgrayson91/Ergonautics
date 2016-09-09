@@ -36,6 +36,8 @@ public class AddTaskFragment extends Fragment {
     private ITaskListUpdateListener mTaskSubmissionListener;
     private Task toConstruct;
 
+    public AddTaskFragment(){}
+
     public static AddTaskFragment newInstance() {
         AddTaskFragment f = new AddTaskFragment();
         //TODO: take in an optional ID of an existing task
@@ -49,7 +51,7 @@ public class AddTaskFragment extends Fragment {
         try {
             mTaskSubmissionListener = (ITaskListUpdateListener) getActivity();
         } catch (ClassCastException ex){
-            throw new ClassCastException("Activity containing AddTaskDialogFragment must implement ITaskListUpdateListener");
+            throw new ClassCastException("Activity containing AddTaskFragment must implement ITaskListUpdateListener");
         }
     }
 

@@ -7,6 +7,5 @@ import com.ergonautics.ergonautics.models.Task;
  */
 public interface ITaskListUpdateListener {
 
-    void onAddTaskSelected();
     void onTaskSubmitted(Task t);
 }

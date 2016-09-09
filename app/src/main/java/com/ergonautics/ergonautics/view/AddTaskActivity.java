@@ -12,6 +12,7 @@ import com.ergonautics.ergonautics.models.DBModelHelper;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.presenter.TaskPresenter;
 import com.ergonautics.ergonautics.storage.DBHelper;
+import com.ergonautics.ergonautics.storage.LocalStorage;
 
 public class AddTaskActivity extends AppCompatActivity implements ITaskListUpdateListener {
     private static final String TAG = "ERGONAUT-ADDTASK";
@@ -28,17 +29,17 @@ public class AddTaskActivity extends AppCompatActivity implements ITaskListUpdat
     }
 
     @Override
-    public void onAddTaskSelected() {}
-
-    @Override
     public void onTaskSubmitted(Task t) {
-        //TODO: should have a current board active when creating tasks, explicit DB Access here is a No No in general
-        Cursor allBoards = new DBHelper(AddTaskActivity.this).getAllBoards();
-        allBoards.moveToFirst();
-        Board temp = DBModelHelper.getBoardFromCursor(allBoards);
-        allBoards.close();
-        mPresenter.addData(t, temp.getBoardId());
-        Log.d(TAG, "onTaskSubmitted: Added task : " + t.getDisplayName());
+        Board current = LocalStorage.getInstance(this).getSelectedBoard();
+        Log.d(TAG, "onTaskSubmitted: Adding task to " + current.getDisplayName());
+        if(current == null) {
+            //TODO: explicit DB Access here is a No No in general, should force board selection
+            Cursor allBoards = new DBHelper(AddTaskActivity.this).getAllBoards();
+            allBoards.moveToFirst();
+            current = DBModelHelper.getBoardFromCursor(allBoards);
+            allBoards.close();
+        }
+        mPresenter.addData(t, current.getBoardId());
         setResult(RESULT_OK);
         finish();
     }

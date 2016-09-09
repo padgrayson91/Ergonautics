@@ -6,11 +6,6 @@
         android:id="@+id/recycler_tasks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/button_add_task"
-        android:layout_width="@dimen/floating_action_button_width"
-        android:layout_height="@dimen/floating_action_button_height"
-        android:layout_gravity="bottom|end"/>
 
 
 </FrameLayout>

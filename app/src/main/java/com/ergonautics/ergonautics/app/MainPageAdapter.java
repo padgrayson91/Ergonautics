@@ -11,7 +11,10 @@ import java.util.ArrayList;
  */
 public class MainPageAdapter extends FragmentPagerAdapter {
     private ArrayList<Fragment> mFragments;
-    private static final String[] PAGE_TITLES = {"Boards", "Tasks"};
+    private static final String[] PAGE_TITLES = {"Tasks"};
+
+    //Constants for identifying page indices
+    public static final int PAGE_TASKS = 0;
 
     public MainPageAdapter(FragmentManager fm, ArrayList<Fragment> fragments) {
         super(fm);

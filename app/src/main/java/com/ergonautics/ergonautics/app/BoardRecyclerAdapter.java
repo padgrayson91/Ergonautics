@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ergonautics.ergonautics.R;
+import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.presenter.BoardPresenter;
 import com.ergonautics.ergonautics.presenter.IPresenterCallback;
 import com.ergonautics.ergonautics.view.BoardViewHolder;
@@ -20,11 +21,16 @@ public class BoardRecyclerAdapter extends RecyclerView.Adapter<BoardViewHolder> 
     private static final String TAG = "ERGONAUT-ADAPT";
     private static BoardPresenter mPresenter;
     private ArrayList<Integer> mSelectedBoards;
+    private BoardSelectedListener mListener;
 
     public BoardRecyclerAdapter(Context c){
         if(mPresenter == null) {
             mPresenter = new BoardPresenter(c, this);
         }
+    }
+
+    public void addBoardSelectedListener(BoardSelectedListener listener){
+        mListener = listener;
     }
 
     @Override
@@ -64,9 +70,16 @@ public class BoardRecyclerAdapter extends RecyclerView.Adapter<BoardViewHolder> 
         //TODO: keep a copy of the removed board so it can be restored if needed
     }
 
+    public void refresh(){
+        mPresenter.refresh();
+    }
+
     @Override
     public void onClickBoard(int position) {
-        //TODO: tell MainActivity to switch to task list for this board
+        if(mListener != null){
+            Board b = mPresenter.getData(position);
+            mListener.onBoardSelected(b);
+        }
     }
 
     @Override
@@ -77,5 +90,9 @@ public class BoardRecyclerAdapter extends RecyclerView.Adapter<BoardViewHolder> 
             mSelectedBoards.add(position);
         }
 
+    }
+
+    public interface BoardSelectedListener {
+        void onBoardSelected(Board b);
     }
 }

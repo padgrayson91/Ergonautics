@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.ergonautics.ergonautics.models.JsonModelHelper;
+import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.models.Task;
 
-import org.json.JSONException;
+import java.util.HashMap;
 
 /**
  * Created by patrickgrayson on 8/18/16.
@@ -17,6 +17,7 @@ public class LocalStorage {
     private static final String TAG = "ERGONAUT-STORE";
     private static LocalStorage sInstance;
     private static SharedPreferences mPrefs;
+    private static HashMap<String, Object> mSessionStorage; //Kept in memory as long as user leaves the app open
 
     public static LocalStorage getInstance(Context c){
         if(c == null){
@@ -31,11 +32,13 @@ public class LocalStorage {
 
     private LocalStorage(Context c){
         mPrefs = c.getSharedPreferences(LocalStorage.class.getCanonicalName(), Context.MODE_PRIVATE);
+        mSessionStorage = new HashMap<>();
     }
 
-    //Keys for SharedPrefs
+    //Keys for SharedPrefs and SessionStorage
     private static final String PROPERTY_SESSION_TOKEN = "session_token";
     private static final String PROPERTY_TASK_IN_PROGRESS = "task_in_progress";
+    private static final String PROPERTY_SELECTED_BOARD = "selected_board";
 
     //Getters
 
@@ -49,20 +52,22 @@ public class LocalStorage {
 
     /**
      *
-     * @return a Task object that was most recently being constructed
+     * @return a Task object that was most recently being constructed or null
      */
-    //TODO: task in progress should be accessed via singleton in case the user closes the app
     public Task getTaskInProgress() {
-        Task inProgress = new Task("");
-        String taskJSON = mPrefs.getString(PROPERTY_TASK_IN_PROGRESS, null);
-        if(taskJSON != null){
-            try {
-                inProgress = JsonModelHelper.getTaskFromJson(taskJSON);
-            } catch (JSONException e) {
-                Log.e(TAG, "getTaskInProgress: Malformed JSON in Local Storage! " + taskJSON);
-            }
+        if(mSessionStorage.containsKey(PROPERTY_TASK_IN_PROGRESS)) {
+            return (Task) mSessionStorage.get(PROPERTY_TASK_IN_PROGRESS);
+        } else {
+            return null;
         }
-        return inProgress;
+    }
+
+    public Board getSelectedBoard() {
+        if(mSessionStorage.containsKey(PROPERTY_SELECTED_BOARD)) {
+            return (Board) mSessionStorage.get(PROPERTY_SELECTED_BOARD);
+        } else {
+            return null;
+        }
     }
 
     //Setters
@@ -81,20 +86,15 @@ public class LocalStorage {
      *
      * @param inProgress the task to store
      */
-    //TODO: task in progress should be accessed via singleton in case the user closes the app
     public void setTaskInProgress(Task inProgress){
-        SharedPreferences.Editor editor = mPrefs.edit();
-        if(inProgress == null){
-            editor.putString(PROPERTY_TASK_IN_PROGRESS, null);
-        } else {
-            try {
-                String taskJSON = JsonModelHelper.getTaskAsJson(inProgress);
-                editor.putString(PROPERTY_TASK_IN_PROGRESS, taskJSON);
-            } catch (JSONException e) {
-                Log.e(TAG, "setTaskInProgress: Unable to get JSON from Task!");
-                editor.putString(PROPERTY_TASK_IN_PROGRESS, null);
-            }
-        }
-        editor.commit();
+        mSessionStorage.put(PROPERTY_TASK_IN_PROGRESS, inProgress);
+    }
+
+    /**
+     * Store which board the user is currently viewing
+     * @param selected the board the user wants to view
+     */
+    public void setSelectedBoard(Board selected){
+        mSessionStorage.put(PROPERTY_SELECTED_BOARD, selected);
     }
 }

@@ -18,8 +18,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.LoginActivity" />
-        <activity android:name=".view.AddTaskActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"/>
+        <activity
+            android:name=".view.AddTaskActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+        <activity
+            android:name=".view.AddBoardActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
 
         <provider
             android:name=".storage.ErgonautContentProvider"

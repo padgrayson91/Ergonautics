@@ -4,6 +4,7 @@
     <string name="hint_edit_username">Username</string>
     <string name="hint_edit_password">Password</string>
     <string name="text_button_next">Next</string>
+    <string name="text_button_new_board">New Board</string>
     <string name="text_button_prev">Previous</string>
     <string name="text_button_start">Start</string>
     <string name="text_button_pause">Pause</string>
@@ -12,6 +13,8 @@
     <string name="text_button_submit">Submit</string>
     <string name="text_header_name_task">What do you need to do?</string>
     <string name="text_header_time_estimate_task">How long will that take?</string>
+    <string name="text_header_name_board">What is this board for?</string>
+    <string name="text_main_drawer_open">Boards</string>
 
     <string-array name="array_time_suggestions">
         <item>15 minutes|900000</item>
@@ -20,7 +23,4 @@
         <item>1 hour|3600000</item>
         <item>2 hours|4500000</item>
     </string-array>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

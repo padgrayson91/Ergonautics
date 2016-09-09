@@ -142,6 +142,12 @@ public class TaskPresenter extends BasePresenter<Task> implements SwipeableRecyc
         } catch (NullPointerException ignored){}
     }
 
+    //TODO: the listener should really be a separate class or implemented in the TaskRecyclerAdapter
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //                      Listener Methods                                                    //
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
     @Override
     public boolean canSwipeLeft(int position) {
         return true;
@@ -177,6 +183,10 @@ public class TaskPresenter extends BasePresenter<Task> implements SwipeableRecyc
             removeData(data);
         }
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //                      Listener Methods                                                    //
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
     public void startTask(int position){
         Task t = mTasks.get(position);

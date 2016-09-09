@@ -2,7 +2,6 @@ package com.ergonautics.ergonautics.app;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +56,6 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> im
 
     @Override
     public void notifyDataAdded(String id) {
-        Log.d(TAG, "notifyDataAdded: Data changed in adapter, notifying...");
         notifyDataSetChanged();
     }
 
@@ -95,4 +93,6 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> im
     public void onClickFinish(int position) {
         mPresenter.finishTask(position);
     }
+
+    //TODO: implement swipe listener methods
 }
