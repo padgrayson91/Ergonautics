@@ -165,12 +165,12 @@ public class MainActivity extends AppCompatActivity implements BoardRecyclerAdap
         if(selected.getId() == R.id.button_create_new) {
             switch (mPager.getCurrentItem()) {
                 case MainPageAdapter.PAGE_TASKS:
-                    Intent addTaskIntent = new Intent(MainActivity.this, AddTaskActivity.class);
+                    Intent addTaskIntent = new Intent(MainActivity.this, TaskAddActivity.class);
                     startActivityForResult(addTaskIntent, REQUEST_CODE_ADD_TASK);
                     break;
             }
         } else if(selected.getId() == R.id.button_create_new_board) {
-            Intent addBoardIntent = new Intent(MainActivity.this, AddBoardActivity.class);
+            Intent addBoardIntent = new Intent(MainActivity.this, BoardAddActivity.class);
             startActivityForResult(addBoardIntent, REQUEST_CODE_ADD_BOARD);
         }
     }

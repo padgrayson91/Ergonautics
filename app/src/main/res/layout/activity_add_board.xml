@@ -7,11 +7,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.ergonautics.ergonautics.view.AddBoardActivity">
+    tools:context=".view.BoardAddActivity">
     <fragment
         android:id="@+id/fragment_board_creator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.ergonautics.ergonautics.view.AddBoardFragment"/>
+        android:name="com.ergonautics.ergonautics.view.BoardAddFragment"/>
 
 </RelativeLayout>

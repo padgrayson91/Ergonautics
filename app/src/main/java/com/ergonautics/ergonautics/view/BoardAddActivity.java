@@ -8,7 +8,7 @@ import com.ergonautics.ergonautics.app.IBoardListUpdateListener;
 import com.ergonautics.ergonautics.models.Board;
 import com.ergonautics.ergonautics.presenter.BoardPresenter;
 
-public class AddBoardActivity extends AppCompatActivity implements IBoardListUpdateListener {
+public class BoardAddActivity extends AppCompatActivity implements IBoardListUpdateListener {
     private static BoardPresenter mPresenter;
 
     @Override
@@ -16,7 +16,7 @@ public class AddBoardActivity extends AppCompatActivity implements IBoardListUpd
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_board);
         if(mPresenter == null){
-            mPresenter = new BoardPresenter(AddBoardActivity.this, null);
+            mPresenter = new BoardPresenter(BoardAddActivity.this, null);
         }
     }
 

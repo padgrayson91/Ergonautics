@@ -17,14 +17,14 @@ import com.ergonautics.ergonautics.models.Board;
 /**
  * Created by patrickgrayson on 9/7/16.
  */
-public class AddBoardFragment extends Fragment {
+public class BoardAddFragment extends Fragment {
     private static final String TAG = "ERGONAUT-BRDDLG";
     private IBoardListUpdateListener mBoardSubmissionListener;
     private EditText mBoardNameEdit;
     private Button mBoardSubmissionButton;
     private Board toSubmit;
 
-    public AddBoardFragment(){}
+    public BoardAddFragment(){}
 
     @Override
     public void onAttach(Context context) {

@@ -26,6 +26,8 @@ public class TaskNamerFragment extends Fragment {
     //TODO: this fragment will allow user to select from a list of all the task names used previously
     // Or create a new task name
 
+    public TaskNamerFragment(){}
+
 
     @Override
     public void onAttach(Context context) {

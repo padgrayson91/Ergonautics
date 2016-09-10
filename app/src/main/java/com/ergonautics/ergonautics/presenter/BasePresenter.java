@@ -13,13 +13,14 @@ public abstract class BasePresenter<T> {
     public abstract ArrayList<T> present();
     public abstract T getData(int position);
     public abstract void removeData(T... data);
+    public abstract void removeData(int position);
     public abstract void addData(Object... data);
     public abstract void updateData(T... data);
     public abstract void newQuery(String query);
     public abstract void refresh();
     public abstract int getCount();
 
-    public void setCallback(@Nullable IPresenterCallback callback){
+    public void addCallback(@Nullable IPresenterCallback callback){
         mCallback = callback;
     }
 

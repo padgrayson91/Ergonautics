@@ -27,7 +27,7 @@ public class BoardPresenter extends BasePresenter<Board>{
     private Context mContext;
 
     public BoardPresenter(Context c, IPresenterCallback callback){
-        super.setCallback(callback);
+        super.addCallback(callback);
         mContext = c;
         mQuery = ErgonautContentProvider.BOARDS_QUERY_URI.toString();
         newQuery(mQuery);
@@ -64,6 +64,19 @@ public class BoardPresenter extends BasePresenter<Board>{
             throw new IllegalArgumentException("method removeData requires at least one object of type Board to remove");
         }
 
+    }
+
+    @Override
+    public void removeData(int position) {
+        Board toRemove = mBoards.get(position);
+        String id = toRemove.getBoardId();
+        mContext.getContentResolver().delete(Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, id), null, null);
+        try {
+            super.getCallback().notifyDataRemoved(toRemove);
+        } catch (NullPointerException ignored){
+            Log.w(TAG, "removeData: presenter didn't have a callback");
+        }
+        refresh();
     }
 
     @Override

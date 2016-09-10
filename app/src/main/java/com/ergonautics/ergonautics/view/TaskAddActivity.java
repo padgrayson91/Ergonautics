@@ -13,7 +13,7 @@ import com.ergonautics.ergonautics.presenter.TaskPresenter;
 import com.ergonautics.ergonautics.storage.DBHelper;
 import com.ergonautics.ergonautics.storage.LocalStorage;
 
-public class AddTaskActivity extends AppCompatActivity implements ITaskListUpdateListener {
+public class TaskAddActivity extends AppCompatActivity implements ITaskListUpdateListener {
     private static final String TAG = "ERGONAUT-ADDTASK";
 
     private static TaskPresenter mPresenter;
@@ -32,7 +32,7 @@ public class AddTaskActivity extends AppCompatActivity implements ITaskListUpdat
         Board current = LocalStorage.getInstance(this).getSelectedBoard();
         if(current == null) {
             //TODO: explicit DB Access here is a No No in general, should force board selection
-            Cursor allBoards = new DBHelper(AddTaskActivity.this).getAllBoards();
+            Cursor allBoards = new DBHelper(TaskAddActivity.this).getAllBoards();
             allBoards.moveToFirst();
             current = DBModelHelper.getBoardFromCursor(allBoards);
             allBoards.close();

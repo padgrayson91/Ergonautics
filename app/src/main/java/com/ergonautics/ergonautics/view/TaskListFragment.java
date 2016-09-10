@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ergonautics.ergonautics.R;
+import com.ergonautics.ergonautics.app.SimpleSwipeListener;
 import com.ergonautics.ergonautics.app.TaskRecyclerAdapter;
 
 /**
@@ -48,7 +49,8 @@ public class TaskListFragment extends Fragment{
         }
         mTasksRecycler.setAdapter(mAdapter);
         mTasksRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        mTasksRecycler.addOnItemTouchListener(new SwipeableRecyclerViewTouchListener(mTasksRecycler, mAdapter.getPresenter()));
+        SimpleSwipeListener listener = new SimpleSwipeListener(mAdapter.getPresenter());
+        mTasksRecycler.addOnItemTouchListener(new SwipeableRecyclerViewTouchListener(mTasksRecycler, listener));
         return root;
     }
 

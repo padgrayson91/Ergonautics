@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * Created by patrickgrayson on 8/30/16.
  * Dialog for allowing users to create a new task
  */
-public class AddTaskFragment extends Fragment implements ICreationFragmentCallback {
+public class TaskAddFragment extends Fragment implements ICreationFragmentCallback {
     private static final String TAG = "ERGONAUT-TASKDLG";
 
     private ViewPager mTaskCreationPager; //View pager containing fragments for each step in the task creation process
@@ -37,10 +37,10 @@ public class AddTaskFragment extends Fragment implements ICreationFragmentCallba
     private ITaskListUpdateListener mTaskSubmissionListener;
     private Task toConstruct;
 
-    public AddTaskFragment(){}
+    public TaskAddFragment(){}
 
-    public static AddTaskFragment newInstance() {
-        AddTaskFragment f = new AddTaskFragment();
+    public static TaskAddFragment newInstance() {
+        TaskAddFragment f = new TaskAddFragment();
         //TODO: take in an optional ID of an existing task
         return f;
     }
@@ -98,6 +98,12 @@ public class AddTaskFragment extends Fragment implements ICreationFragmentCallba
 
     private void loadTaskCreationSteps(){
         ArrayList<Fragment> fragments = new ArrayList<>();
+        //Check if a board is selected, and if not make the user select one
+        LocalStorage storage = LocalStorage.getInstance(getContext());
+        if(storage.getSelectedBoard() == null){
+            TaskBoardSelectorFragment tbsf = TaskBoardSelectorFragment.newInstance();
+            fragments.add(tbsf);
+        }
         TaskNamerFragment tnf = TaskNamerFragment.getInstance();
         TaskTimeEstimateFragment ttef = TaskTimeEstimateFragment.newInstance();
         //TODO: other fragments representing different creation steps
@@ -117,6 +123,9 @@ public class AddTaskFragment extends Fragment implements ICreationFragmentCallba
             toConstruct.setDisplayName(((TaskNamerFragment)current).getName());
         } else if (current instanceof TaskTimeEstimateFragment){
             toConstruct.setTimeEstimate(((TaskTimeEstimateFragment)current).getSelection());
+        } else if (current instanceof TaskBoardSelectorFragment){
+            LocalStorage storage = LocalStorage.getInstance(getContext());
+            storage.setSelectedBoard(((TaskBoardSelectorFragment)current).getSelection());
         }
     }
 
@@ -138,6 +147,8 @@ public class AddTaskFragment extends Fragment implements ICreationFragmentCallba
             mHeaderText.setText(getResources().getString(R.string.text_header_name_task));
         } else if(f instanceof TaskTimeEstimateFragment) {
             mHeaderText.setText(getResources().getString(R.string.text_header_time_estimate_task));
+        } else if(f instanceof TaskBoardSelectorFragment) {
+            mHeaderText.setText(getResources().getString(R.string.text_header_task_board));
         }
     }
 

@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.ergonautics.ergonautics.models.DBModelHelper;
@@ -13,7 +12,6 @@ import com.ergonautics.ergonautics.models.ModelConstants;
 import com.ergonautics.ergonautics.models.Task;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
 import com.ergonautics.ergonautics.storage.UriHelper;
-import com.ergonautics.ergonautics.view.SwipeableRecyclerViewTouchListener;
 
 import java.util.ArrayList;
 
@@ -22,7 +20,7 @@ import java.util.ArrayList;
  * Presenter used to expose Task objects to view components
  */
 @SuppressWarnings("ConstantConditions")
-public class TaskPresenter extends BasePresenter<Task> implements SwipeableRecyclerViewTouchListener.SwipeListener {
+public class TaskPresenter extends BasePresenter<Task>  {
     private static final String TAG = "ERGONAUT-PRESENT";
 
     private Cursor mCursor;
@@ -37,7 +35,7 @@ public class TaskPresenter extends BasePresenter<Task> implements SwipeableRecyc
      * @param callback Callback to receive information about data that is changed
      */
     public TaskPresenter(Context c, IPresenterCallback callback){
-        super.setCallback(callback);
+        super.addCallback(callback);
         mQuery = ErgonautContentProvider.TASKS_QUERY_URI.toString();
         mContext = c;
         newQuery(mQuery);
@@ -50,7 +48,7 @@ public class TaskPresenter extends BasePresenter<Task> implements SwipeableRecyc
      * @param callback Callback to receive information about data that is changed
      */
     public TaskPresenter(@Nullable String query, @NonNull Context c, @Nullable IPresenterCallback callback){
-        super.setCallback(callback);
+        super.addCallback(callback);
         mQuery = query;
         mContext = c;
         if(mQuery != null) {
@@ -98,6 +96,19 @@ public class TaskPresenter extends BasePresenter<Task> implements SwipeableRecyc
     }
 
     @Override
+    public void removeData(int position) {
+        Task removed = mTasks.get(position);
+        Uri deleteUri = Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, removed.getTaskId());
+        mContext.getContentResolver().delete(deleteUri, null, null);
+        try {
+            super.getCallback().notifyDataRemoved(removed);
+        } catch (NullPointerException ignored){
+            Log.w(TAG, "removeData: presenter didn't have a callback");
+        }
+        refresh();
+    }
+
+    @Override
     public void refresh() {
         if(mQuery != null) {
             newQuery(mQuery);
@@ -141,52 +152,6 @@ public class TaskPresenter extends BasePresenter<Task> implements SwipeableRecyc
             super.getCallback().notifyDataUpdated();
         } catch (NullPointerException ignored){}
     }
-
-    //TODO: the listener should really be a separate class or implemented in the TaskRecyclerAdapter
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    //                      Listener Methods                                                    //
-    //////////////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public boolean canSwipeLeft(int position) {
-        return true;
-    }
-
-    @Override
-    public boolean canSwipeRight(int position) {
-        return true;
-    }
-
-    @Override
-    public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
-        if(mQuery == null){
-            return;
-        }
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
-        for(int position : reverseSortedPositions){
-            mCursor.moveToPosition(position);
-            Task data = DBModelHelper.getTaskFromCursor(mCursor);
-            removeData(data);
-        }
-    }
-
-    @Override
-    public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
-        if(mQuery == null){
-            return;
-        }
-        mCursor = mContext.getContentResolver().query(Uri.parse(mQuery), null, null, null, null);
-        for(int position : reverseSortedPositions){
-            mCursor.moveToPosition(position);
-            Task data = DBModelHelper.getTaskFromCursor(mCursor);
-            removeData(data);
-        }
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    //                      Listener Methods                                                    //
-    //////////////////////////////////////////////////////////////////////////////////////////////
 
     public void startTask(int position){
         Task t = mTasks.get(position);

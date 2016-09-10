@@ -20,10 +20,10 @@
         <activity android:name=".view.LoginActivity" />
         <activity
             android:windowSoftInputMode="adjustResize"
-            android:name=".view.AddTaskActivity"
+            android:name=".view.TaskAddActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity
-            android:name=".view.AddBoardActivity"
+            android:name=".view.BoardAddActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
 
         <provider
