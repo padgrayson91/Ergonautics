@@ -22,6 +22,7 @@ import com.ergonautics.ergonautics.R;
 import com.ergonautics.ergonautics.app.BoardRecyclerAdapter;
 import com.ergonautics.ergonautics.app.MainPageAdapter;
 import com.ergonautics.ergonautics.models.Board;
+import com.ergonautics.ergonautics.presenter.IPresenterCallback;
 import com.ergonautics.ergonautics.storage.ErgonautContentProvider;
 import com.ergonautics.ergonautics.storage.LocalStorage;
 import com.ergonautics.ergonautics.storage.UriHelper;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 /**
  * App main page where user can view active tasks, current boards, notifications, etc.
  */
-public class MainActivity extends AppCompatActivity implements BoardRecyclerAdapter.BoardSelectedListener {
+public class MainActivity extends AppCompatActivity implements BoardRecyclerAdapter.BoardSelectedListener, IPresenterCallback {
     private static final String TAG = "ERGONAUT-MAIN";
 
     //Request codes for starting activities
@@ -193,5 +194,21 @@ public class MainActivity extends AppCompatActivity implements BoardRecyclerAdap
         mDrawerToggle = new android.support.v7.app.ActionBarDrawerToggle(this,mDrawer,mToolbar,R.string.app_name, R.string.app_name);
         //This is necessary to change the icon of the Drawer Toggle upon state change.
         mDrawerToggle.syncState();
+    }
+
+    //Methods to handle the task or board lists updating
+    @Override
+    public void notifyDataAdded(String id) {
+        mDrawerAdapter.refresh();
+    }
+
+    @Override
+    public void notifyDataUpdated() {
+        mDrawerAdapter.refresh();
+    }
+
+    @Override
+    public void notifyDataRemoved(Object data) {
+        mDrawerAdapter.refresh();
     }
 }

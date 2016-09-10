@@ -13,16 +13,19 @@ import android.view.ViewGroup;
 import com.ergonautics.ergonautics.R;
 import com.ergonautics.ergonautics.app.SimpleSwipeListener;
 import com.ergonautics.ergonautics.app.TaskRecyclerAdapter;
+import com.ergonautics.ergonautics.presenter.IPresenterCallback;
+import com.ergonautics.ergonautics.presenter.TaskPresenter;
 
 /**
  * Created by patrickgrayson on 8/24/16.
  */
-public class TaskListFragment extends Fragment{
+public class TaskListFragment extends Fragment implements IPresenterCallback{
     private static final String TAG = "ERGONAUT-TASKS";
     private static final String ARGS_KEY_QUERY = "query";
     private RecyclerView mTasksRecycler;
     private TaskRecyclerAdapter mAdapter;
     private String mQuery;
+    private static TaskPresenter mPresenter;
 
     public static TaskListFragment newInstance(String query){
         TaskListFragment fragment = new TaskListFragment();
@@ -43,7 +46,15 @@ public class TaskListFragment extends Fragment{
         Bundle args = getArguments();
         if (args != null) {
             mQuery = args.getString(ARGS_KEY_QUERY);
-            mAdapter = new TaskRecyclerAdapter(mQuery, getContext());
+            //get a new presenter instance if we need one
+            if(mPresenter == null){
+                mPresenter = new TaskPresenter(mQuery, getContext(), this);
+                if(getActivity() instanceof IPresenterCallback) {
+                    mPresenter.addCallback((IPresenterCallback) getActivity());
+                }
+            }
+            //Assign the presenter to the adapter
+            mAdapter = new TaskRecyclerAdapter(mQuery, getContext(), mPresenter);
         } else {
             throw new IllegalStateException("Cannot initialize TaskListFragment with no arguments! Did you forget to use newInstance?");
         }
@@ -64,6 +75,22 @@ public class TaskListFragment extends Fragment{
     public void newQuery(String query){
         mQuery = query;
         mAdapter.setQuery(query);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataAdded(String id) {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataUpdated() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataRemoved(Object data) {
+        //TODO: keep a local copy of the task so it can be re-inserted if the user hits undo
         mAdapter.notifyDataSetChanged();
     }
 }

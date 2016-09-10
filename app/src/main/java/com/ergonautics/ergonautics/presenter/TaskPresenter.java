@@ -85,7 +85,9 @@ public class TaskPresenter extends BasePresenter<Task>  {
             mContext.getContentResolver().delete(deleteUri, null, null);
             Log.d(TAG, "removeData: Removed task with id: " + removed.getTaskId());
             try {
-                super.getCallback().notifyDataRemoved(removed);
+                for(IPresenterCallback callback: super.getCallbacks()) {
+                    callback.notifyDataRemoved(removed);
+                }
             } catch (NullPointerException ignored){
                 Log.w(TAG, "removeData: presenter didn't have a callback");
             }
@@ -101,7 +103,9 @@ public class TaskPresenter extends BasePresenter<Task>  {
         Uri deleteUri = Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, removed.getTaskId());
         mContext.getContentResolver().delete(deleteUri, null, null);
         try {
-            super.getCallback().notifyDataRemoved(removed);
+            for(IPresenterCallback callback: super.getCallbacks()) {
+                callback.notifyDataRemoved(removed);
+            }
         } catch (NullPointerException ignored){
             Log.w(TAG, "removeData: presenter didn't have a callback");
         }
@@ -125,7 +129,9 @@ public class TaskPresenter extends BasePresenter<Task>  {
             String taskId = result.getLastPathSegment();
             Log.d(TAG, "addData: Added task with id: " + added.getTaskId());
             try {
-                super.getCallback().notifyDataAdded(taskId);
+                for(IPresenterCallback callback: super.getCallbacks()) {
+                    callback.notifyDataAdded(taskId);
+                }
             } catch (NullPointerException ignored){
                 Log.w(TAG, "addData: presenter didn't have a callback");
             }
@@ -149,7 +155,9 @@ public class TaskPresenter extends BasePresenter<Task>  {
         mCursor = mContext.getContentResolver().query(Uri.parse(query), null, null, null, null);
         getArrayListFromCursor();
         try {
-            super.getCallback().notifyDataUpdated();
+            for(IPresenterCallback callback: super.getCallbacks()) {
+                callback.notifyDataUpdated();
+            }
         } catch (NullPointerException ignored){}
     }
 
@@ -161,7 +169,9 @@ public class TaskPresenter extends BasePresenter<Task>  {
         mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
         refresh();
         try {
-            super.getCallback().notifyDataUpdated();
+            for(IPresenterCallback callback: super.getCallbacks()) {
+                callback.notifyDataUpdated();
+            }
         } catch (NullPointerException ignored){}
     }
 
@@ -173,7 +183,9 @@ public class TaskPresenter extends BasePresenter<Task>  {
         mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
         refresh();
         try {
-            super.getCallback().notifyDataUpdated();
+            for(IPresenterCallback callback: super.getCallbacks()) {
+                callback.notifyDataUpdated();
+            }
         } catch (NullPointerException ignored){}
     }
 
@@ -184,7 +196,9 @@ public class TaskPresenter extends BasePresenter<Task>  {
         mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
         refresh();
         try {
-            super.getCallback().notifyDataUpdated();
+            for(IPresenterCallback callback: super.getCallbacks()) {
+                callback.notifyDataUpdated();
+            }
         } catch (NullPointerException ignored){}
     }
 
@@ -196,15 +210,15 @@ public class TaskPresenter extends BasePresenter<Task>  {
         mContext.getContentResolver().update(Uri.withAppendedPath(ErgonautContentProvider.TASKS_QUERY_URI, t.getTaskId()), DBModelHelper.getContentValuesForTask(t), null, null);
         refresh();
         try {
-            super.getCallback().notifyDataUpdated();
+            for(IPresenterCallback callback: super.getCallbacks()) {
+                callback.notifyDataUpdated();
+            }
         } catch (NullPointerException ignored){}
     }
 
     private void getArrayListFromCursor(){
         mTasks = new ArrayList<>();
-        if(mCursor == null){
-            return;
-        } else {
+        if(mCursor != null) {
             mCursor.moveToFirst();
             while(!mCursor.isAfterLast()){
                 mTasks.add(DBModelHelper.getTaskFromCursor(mCursor));

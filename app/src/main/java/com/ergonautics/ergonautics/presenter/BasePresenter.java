@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Created by patrickgrayson on 9/2/16.
  */
 public abstract class BasePresenter<T> {
-    private IPresenterCallback mCallback;
+    private ArrayList<IPresenterCallback> mCallbacks;
 
     public abstract ArrayList<T> present();
     public abstract T getData(int position);
@@ -21,11 +21,14 @@ public abstract class BasePresenter<T> {
     public abstract int getCount();
 
     public void addCallback(@Nullable IPresenterCallback callback){
-        mCallback = callback;
+        if(mCallbacks == null){
+            mCallbacks = new ArrayList<>();
+        }
+        mCallbacks.add(callback);
     }
 
     @Nullable
-    public IPresenterCallback getCallback(){
-        return mCallback;
+    public ArrayList<IPresenterCallback> getCallbacks(){
+        return mCallbacks;
     }
 }

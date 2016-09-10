@@ -17,14 +17,12 @@ import com.ergonautics.ergonautics.view.TaskViewHolder;
  */
 public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> implements IPresenterCallback, TaskViewHolder.ITaskViewHolderClickCallback {
     private static final String TAG = "ERGONAUT-ADAPT";
-    private static TaskPresenter mPresenter;
+    private TaskPresenter mPresenter;
     private String mQuery;
     private Context mContext;
 
-    public TaskRecyclerAdapter(String query, Context c){
-        if(mPresenter == null) {
-            mPresenter = new TaskPresenter(query, c, this);
-        }
+    public TaskRecyclerAdapter(String query, Context c, TaskPresenter presenter){
+        mPresenter = presenter;
         mContext = c;
         mQuery = query;
     }
@@ -40,7 +38,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> im
 
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
-        Task t = (Task) mPresenter.getData(position);
+        Task t = mPresenter.getData(position);
         holder.setViews(t);
     }
 
@@ -93,6 +91,4 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskViewHolder> im
     public void onClickFinish(int position) {
         mPresenter.finishTask(position);
     }
-
-    //TODO: implement swipe listener methods
 }

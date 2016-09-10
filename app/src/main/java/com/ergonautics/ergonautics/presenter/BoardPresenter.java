@@ -55,7 +55,9 @@ public class BoardPresenter extends BasePresenter<Board>{
             String id = toRemove.getBoardId();
             mContext.getContentResolver().delete(Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, id), null, null);
             try {
-                super.getCallback().notifyDataRemoved(toRemove);
+                for(IPresenterCallback callback: super.getCallbacks()) {
+                    callback.notifyDataRemoved(toRemove);
+                }
             } catch (NullPointerException ignored){
                 Log.w(TAG, "removeData: presenter didn't have a callback");
             }
@@ -72,7 +74,9 @@ public class BoardPresenter extends BasePresenter<Board>{
         String id = toRemove.getBoardId();
         mContext.getContentResolver().delete(Uri.withAppendedPath(ErgonautContentProvider.BOARDS_QUERY_URI, id), null, null);
         try {
-            super.getCallback().notifyDataRemoved(toRemove);
+            for(IPresenterCallback callback: super.getCallbacks()) {
+                callback.notifyDataRemoved(toRemove);
+            }
         } catch (NullPointerException ignored){
             Log.w(TAG, "removeData: presenter didn't have a callback");
         }
@@ -86,7 +90,9 @@ public class BoardPresenter extends BasePresenter<Board>{
             Uri insertionUri = mContext.getContentResolver().insert(ErgonautContentProvider.BOARDS_INSERT_URI, DBModelHelper.getContentValuesForBoard(toAdd));
             String id = insertionUri.getLastPathSegment();
             try {
-                super.getCallback().notifyDataAdded(id);
+                for(IPresenterCallback callback: super.getCallbacks()) {
+                    callback.notifyDataAdded(id);
+                }
             } catch (NullPointerException ignored){
                 Log.w(TAG, "removeData: presenter didn't have a callback");
             }
@@ -110,7 +116,9 @@ public class BoardPresenter extends BasePresenter<Board>{
         mCursor = mContext.getContentResolver().query(Uri.parse(query), null, null, null, null);
         getArrayListFromCursor();
         try {
-            super.getCallback().notifyDataUpdated();
+            for(IPresenterCallback callback: super.getCallbacks()){
+                callback.notifyDataUpdated();
+            }
         } catch (NullPointerException ignored){}
     }
 
