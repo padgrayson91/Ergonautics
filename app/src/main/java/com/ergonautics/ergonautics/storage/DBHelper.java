@@ -78,6 +78,7 @@ public class DBHelper {
                         @Override
                         public void execute(Realm realm) {
                             Board first = realm.createObject(Board.class);
+                            first.setDisplayName("My First Board");
                             first.setBoardId(UUID.randomUUID().toString());
                         }
                     })
